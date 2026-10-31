@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "contributions": [
+    {
+      "name": "Cédric Bernadac",
+      "kind": "person",
+      "status": "included",
+      "summary": "Game concept and detailed mission specification (shop on a floating market, ten days, forecast-driven buying, fresh-goods decay, one shop upgrade, validation criteria), directed as part of the Z Code game workshop."
+    },
+    {
+      "name": "Z Code",
+      "kind": "agent",
+      "status": "included",
+      "summary": "Designed the economy and implemented the whole game: deterministic seeded engine, six customer profiles, freshness and FIFO pricing with visible arithmetic, trilingual interface (EN/FR/ES), inline-SVG art and synthesized audio; balanced it with a 600-seed strategy simulator and verified the rules with headless tests plus real browser play sessions.",
+      "profileUrl": "https://lob7.com/profiles/usr_ns4cywae"
+    }
+  ],
+  "basedOnReleaseIds": []
+}

@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le Bazar des nuages — The Cloud Bazaar — El Bazar de las nubes</title>
+<meta name="description" content="Run a balloon-hung shop on a floating market: ten days, three customers a day, one voyage to fund. / Tiens une boutique suspendue sur un marché flottant : dix journées, trois clients par jour, un voyage à financer.">
+<style>
+/* Le Bazar des nuages — marché céleste, clair et festif */
+:root {
+  --sky-a: #dceef8; --sky-b: #f3faf5;
+  --cream: #fdf6e9; --cream-2: #f7ecd7;
+  --ink: #2f3b47; --ink-soft: #5c6b7a;
+  --coral: #e2624b; --coral-deep: #c74a35;
+  --mustard: #e8b64c; --mint: #6fbf9b; --mint-deep: #4d9e79;
+  --balloon-blue: #7fb2dd; --rose: #e8a0b4;
+  --line: #e3d5bc; --danger: #c74a35;
+  --shadow: 0 4px 14px rgba(47, 59, 71, .12);
+  --r: 14px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Trebuchet MS", "Segoe UI", Verdana, system-ui, sans-serif;
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--sky-a) 0%, var(--sky-b) 70%, #eef7ee 100%);
+  min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
+}
+#app { max-width: 540px; margin: 0 auto; padding: 10px 12px 28px; }
+.screen { display: none; }
+.screen.active { display: block; animation: fadeIn .35s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ---------- boutons ---------- */
+button {
+  font: inherit; color: var(--ink); background: var(--cream);
+  border: 2px solid var(--ink); border-radius: 12px;
+  padding: 10px 16px; cursor: pointer; font-weight: 700;
+  transition: transform .08s ease, box-shadow .08s ease, background .15s;
+}
+button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow); }
+button:active:not(:disabled) { transform: translateY(1px); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button:focus-visible { outline: 3px solid var(--mustard); outline-offset: 2px; }
+.btn-primary { background: var(--coral); border-color: var(--coral-deep); color: #fff; }
+.btn-mint { background: var(--mint); border-color: var(--mint-deep); color: #fff; }
+.btn-ghost { background: transparent; border-color: var(--ink-soft); color: var(--ink-soft); padding: 6px 10px; font-weight: 600; }
+.btn-big { font-size: 1.15rem; padding: 13px 26px; border-radius: 16px; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.icon-btn { padding: 7px 9px; border-radius: 10px; font-size: .95rem; line-height: 1; }
+
+/* ---------- accueil ---------- */
+#home { text-align: center; padding-top: 8px; }
+.title-art { margin: 0 auto; max-width: 430px; }
+h1.game-title {
+  font-size: clamp(1.6rem, 6vw, 2.3rem); margin: 6px 0 2px; letter-spacing: .5px;
+  color: var(--ink); text-shadow: 0 2px 0 #fff;
+}
+.tagline { color: var(--ink-soft); margin: 0 0 16px; font-size: 1.02rem; }
+.home-buttons { display: flex; flex-direction: column; gap: 10px; align-items: center; margin-top: 6px; }
+.home-meta { margin-top: 14px; color: var(--ink-soft); font-size: .85rem; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+select {
+  font: inherit; padding: 7px 10px; border-radius: 10px; border: 2px solid var(--ink);
+  background: var(--cream); color: var(--ink); font-weight: 700; cursor: pointer;
+}
+
+/* ---------- en-tête de partie ---------- */
+.gamebar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 4px 0 8px; }
+.pill {
+  background: var(--cream); border: 2px solid var(--ink); border-radius: 999px;
+  padding: 5px 12px; font-weight: 700; font-size: .92rem; white-space: nowrap;
+}
+.pill .coin { margin-right: 2px; }
+.goalwrap { flex: 1; min-width: 130px; background: var(--cream); border: 2px solid var(--ink); border-radius: 999px; padding: 4px 10px; position: relative; height: 34px; }
+.goalbar { position: absolute; inset: 3px auto 3px 3px; width: 0%; background: repeating-linear-gradient(45deg, var(--mint), var(--mint) 8px, #8fd4b5 8px, #8fd4b5 16px); border-radius: 999px; transition: width .5s ease; max-width: calc(100% - 6px); }
+.goallabel { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 800; }
+.barbtns { display: flex; gap: 6px; }
+
+/* ---------- scène ---------- */
+.scene { position: relative; border-radius: var(--r); overflow: hidden; border: 2px solid var(--ink); background: linear-gradient(180deg, #cfe7f6 0%, #e6f4ef 100%); box-shadow: var(--shadow); }
+.scene svg { display: block; width: 100%; height: auto; }
+.cloud { animation: drift 26s linear infinite; }
+.cloud.c2 { animation-duration: 34s; animation-delay: -12s; }
+.cloud.c3 { animation-duration: 42s; animation-delay: -20s; }
+@keyframes drift { from { transform: translateX(-90px); } to { transform: translateX(430px); } }
+.balloon-float { animation: bob 5s ease-in-out infinite; transform-origin: center; }
+.balloon-float.b2 { animation-delay: -1.6s; }
+.balloon-float.b3 { animation-delay: -3.2s; }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.customer-slot { position: absolute; left: 4%; bottom: 6px; width: 26%; max-width: 110px; }
+.customer-slot svg { width: 100%; height: auto; }
+.customer-slot.enter { animation: enterCust .45s ease; }
+@keyframes enterCust { from { transform: translateX(-30px) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+.mood-bubble {
+  position: absolute; left: 2%; top: 8%; background: #fff; border: 2px solid var(--ink);
+  border-radius: 12px; padding: 4px 9px; font-size: .78rem; font-weight: 700; max-width: 55%;
+  box-shadow: var(--shadow); opacity: 0; pointer-events: none;
+}
+.mood-bubble.show { opacity: 1; transition: opacity .25s; }
+.scene.lift-off { animation: lift 2.4s ease-in forwards; }
+@keyframes lift { 0% { transform: translateY(0); } 100% { transform: translateY(-120vh); } }
+
+/* ---------- panneaux ---------- */
+.panel {
+  background: var(--cream); border: 2px solid var(--ink); border-radius: var(--r);
+  padding: 14px; margin-top: 10px; box-shadow: var(--shadow);
+}
+.panel h2 { margin: 0 0 8px; font-size: 1.05rem; }
+.hint { color: var(--ink-soft); font-size: .86rem; margin: 4px 0; }
+.forecast {
+  background: #fff8e6; border: 2px dashed var(--mustard); border-radius: 10px;
+  padding: 8px 10px; margin-bottom: 10px; font-size: .92rem;
+}
+.forecast .star { color: var(--coral); }
+
+/* marché */
+.market { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 379px) { .market { grid-template-columns: 1fr; } }
+.good-card {
+  background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 10px;
+  display: flex; flex-direction: column; gap: 6px; position: relative;
+}
+.good-card.demand { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(226, 98, 75, .18); }
+.demand-badge {
+  position: absolute; top: -10px; right: -6px; background: var(--coral); color: #fff;
+  border: 2px solid var(--ink); border-radius: 999px; font-size: .72rem; padding: 2px 8px; font-weight: 800;
+}
+.good-head { display: flex; align-items: center; gap: 8px; }
+.good-head .gicon { width: 34px; height: 34px; flex: none; }
+.good-name { font-weight: 800; font-size: .95rem; line-height: 1.15; }
+.tag { display: inline-block; font-size: .7rem; font-weight: 800; border-radius: 6px; padding: 1px 6px; border: 1.5px solid; }
+.tag.fresh { color: var(--mint-deep); border-color: var(--mint-deep); background: #e9f7ef; }
+.tag.keeps { color: var(--ink-soft); border-color: var(--ink-soft); background: #f1f1ee; }
+.price-row { display: flex; align-items: baseline; gap: 6px; font-size: .88rem; }
+.price { font-size: 1.25rem; font-weight: 800; }
+.trend { font-size: .78rem; font-weight: 700; padding: 1px 6px; border-radius: 6px; }
+.trend.up { color: var(--coral-deep); background: #fbe7e2; }
+.trend.down { color: var(--mint-deep); background: #e5f4ec; }
+.trend.flat { color: var(--ink-soft); background: #eef0ee; }
+.stock-row { font-size: .8rem; color: var(--ink-soft); }
+.stepper { display: flex; align-items: center; gap: 8px; margin-top: auto; }
+.stepper button { width: 40px; height: 36px; padding: 0; font-size: 1.2rem; border-radius: 10px; }
+.stepper .qty { min-width: 26px; text-align: center; font-size: 1.15rem; font-weight: 800; }
+.cartbar {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between;
+  background: var(--cream-2); border: 2px solid var(--ink); border-radius: 12px;
+  padding: 9px 12px; margin-top: 12px; font-size: .92rem; font-weight: 700;
+}
+.cartbar .warn { color: var(--danger); }
+
+/* client */
+.cust-card { background: #fff; border: 2px solid var(--ink); border-radius: 12px; padding: 12px; margin-top: 10px; }
+.cust-head { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+.cust-avatar { width: 54px; height: 54px; flex: none; border-radius: 50%; border: 2px solid var(--ink); background: var(--cream-2); overflow: hidden; }
+.cust-avatar svg { width: 100%; height: 100%; }
+.cust-name { font-weight: 800; }
+.cust-blurb { color: var(--ink-soft); font-size: .82rem; }
+.order-line {
+  display: flex; align-items: center; gap: 8px; padding: 8px 6px; border-top: 1.5px dashed var(--line); flex-wrap: wrap;
+}
+.order-line .gicon { width: 28px; height: 28px; flex: none; }
+.order-main { flex: 1; min-width: 130px; }
+.order-good { font-weight: 800; font-size: .93rem; }
+.order-offer { font-size: .8rem; color: var(--ink-soft); }
+.order-math { font-size: .78rem; color: var(--mint-deep); font-weight: 700; }
+.order-qty { display: flex; align-items: center; gap: 6px; }
+.order-qty .stepper button { width: 36px; height: 32px; }
+.payrow {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  background: var(--cream-2); border-radius: 10px; padding: 8px 12px; margin-top: 8px; font-weight: 800;
+}
+.payrow .amount { font-size: 1.3rem; }
+.cust-actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.cust-actions .btn-primary { flex: 1; min-width: 130px; }
+
+/* récap client */
+.recap-card { text-align: center; padding: 18px 12px; }
+.recap-card .amount { font-size: 2rem; font-weight: 800; color: var(--mint-deep); }
+.recap-card .sad { color: var(--danger); }
+.recap-mood { font-size: 1.05rem; font-weight: 700; margin: 6px 0 10px; }
+
+/* fin de journée / modales */
+.modal-back {
+  position: fixed; inset: 0; background: rgba(47, 59, 71, .45);
+  display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50;
+}
+.modal {
+  background: var(--cream); border: 2px solid var(--ink); border-radius: var(--r);
+  max-width: 480px; width: 100%; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  max-height: 92vh; overflow: auto;
+}
+.modal h2 { margin-top: 0; }
+.ledger { width: 100%; border-collapse: collapse; margin: 8px 0; }
+.ledger td { padding: 4px 6px; border-bottom: 1px dashed var(--line); font-size: .92rem; }
+.ledger td.num { text-align: right; font-weight: 800; white-space: nowrap; }
+.ledger tr.total td { border-bottom: none; border-top: 2px solid var(--ink); font-size: 1.05rem; }
+.plus { color: var(--mint-deep); } .minus { color: var(--danger); }
+
+/* améliorations */
+.upgrades { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.upg-card { background: #fff; border: 2px solid var(--ink); border-radius: 12px; padding: 10px 12px; display: flex; gap: 10px; align-items: center; }
+.upg-ico { width: 44px; height: 44px; flex: none; }
+.upg-card .btn { margin-left: auto; }
+
+/* résultat */
+#result { text-align: center; }
+.result-title { font-size: clamp(1.4rem, 6vw, 2rem); margin: 10px 0 4px; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+.stat { background: var(--cream); border: 2px solid var(--ink); border-radius: 12px; padding: 8px; }
+.stat .v { font-size: 1.3rem; font-weight: 800; }
+.stat .k { font-size: .78rem; color: var(--ink-soft); }
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
+.confetti i { position: absolute; top: -20px; left: 0; width: 10px; height: 14px; opacity: .9; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+/* règles / aide */
+.rules-list { margin: 0; padding-left: 20px; }
+.rules-list li { margin: 8px 0; font-size: .95rem; }
+.kbd { background: #fff; border: 1.5px solid var(--ink); border-bottom-width: 3px; border-radius: 6px; padding: 0 6px; font-size: .85em; font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud, .balloon-float, .customer-slot.enter, .screen.active, .confetti i { animation: none !important; }
+  .goalbar { transition: none; }
+}
+
+</style>
+</head>
+<body>
+<noscript style="display:block;padding:20px;font-family:sans-serif">This game needs JavaScript. / Ce jeu nécessite JavaScript. / Este juego necesita JavaScript.</noscript>
+<div id="app"></div>
+<script>
+/*ENGINE-START*/
+/* =========================================================================
+   Le Bazar des nuages — moteur de jeu (logique pure, sans DOM)
+   Tout est déterministe par graine : mêmes graines => mêmes journées,
+   mêmes prix, mêmes clients. Les calculs sont prévus pour être affichés.
+   ========================================================================= */
+var Bazar = (function () {
+  "use strict";
+
+  /* ---------- RNG déterministe (mulberry32) ---------- */
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function hashSeed(str) {
+    let h = 1779033703 ^ str.length;
+    for (let i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return h >>> 0;
+  }
+
+  /* ---------- Constantes d'équilibrage (toutes visibles en jeu) ---------- */
+  const RULES = {
+    DAYS: 10,            // dix journées
+    START_CAPITAL: 30,   // capital initial
+    CAPACITY: 6,         // entrepôt : six emplacements (1 emplacement = 1 article)
+    MOORING_FEE: 3,      // droit d'amarrage clôturant chaque journée
+    GOAL: 62,            // capital visé après 10 jours pour financer le voyage
+    CUSTOMERS_PER_DAY: 3,
+    DEMAND_COUNT: 2,     // deux marchandises "en demande" par jour
+    DEMAND_OFFER: 1.3,   // les clients paient +30 % sur une marchandise en demande
+    DEMAND_PENALTY: 0.85, // ... et proposent −15 % sur les autres
+    DEMAND_WEIGHT: 5,    // ... et la réclament bien plus souvent (la prévision se lit)
+    FRESH_DECAY: 25,     // un article frais perd 25 % de sa valeur par nuit
+    FRESH_MIN: 25,       // ... sans jamais descendre sous 25 %
+    ICEBOX_DECAY: 10,    // avec la glacière : seulement 10 % par nuit
+    SIGN_BONUS: 1.15,    // avec le ballon-enseigne : offres +15 %
+    SHELF_EXTRA: 2,      // avec l'étagère : +2 emplacements
+    UPGRADE_DAY: 5,      // l'amélioration se choisit au matin du 5e jour
+    PRICE_STEPS: [0.8, 0.9, 1.0, 1.1, 1.2] // variation du prix d'achat
+  };
+
+  /* ---------- Marchandises (4 familles) ---------- */
+  const GOODS = [
+    { id: "berries", fresh: true,  buy: 3, sell: 5 },
+    { id: "lantern", fresh: true,  buy: 5, sell: 8 },
+    { id: "wool",    fresh: false, buy: 4, sell: 6 },
+    { id: "tea",     fresh: false, buy: 6, sell: 9 }
+  ];
+  const GIDX = {};
+  GOODS.forEach(function (g, i) { GIDX[g.id] = i; });
+
+  /* ---------- Profils de clients (6) ----------
+     taste  : pondération des goûts [goodId, poids]
+     lines  : nb de lignes (min,max) — 2 lignes = commande combinée
+     qty    : quantité par ligne (min,max)
+     gen    : générosité [min,max] (multiplicateur d'offre)
+     weight : fréquence d'apparition du profil                                */
+  const PROFILES = [
+    { id: "kid",      weight: 1.1, taste: [["berries", 3], ["lantern", 2], ["wool", 1]], lines: [1, 1], qty: [1, 2], gen: [0.95, 1.10] },
+    { id: "navigator",weight: 1.0, taste: null, lines: [2, 2], qty: [1, 2], gen: [1.00, 1.15] },
+    { id: "shepherd", weight: 1.0, taste: [["wool", 2], ["tea", 1]], lines: [1, 1], qty: [2, 4], gen: [0.90, 1.05] },
+    { id: "aeronaut", weight: 0.6, taste: [["lantern", 1], ["tea", 1]], lines: [2, 2], qty: [1, 2], gen: [1.20, 1.35] },
+    { id: "baker",    weight: 1.0, taste: [["berries", 2], ["lantern", 3]], lines: [1, 2], qty: [2, 3], gen: [1.10, 1.25] },
+    { id: "peddler",  weight: 0.9, taste: null, lines: [1, 1], qty: [3, 4], gen: [0.90, 1.00] }
+  ];
+  const PIDX = {};
+  PROFILES.forEach(function (p, i) { PIDX[p.id] = i; });
+
+  /* ---------- i18n (EN par défaut) ---------- */
+  const LANGS = ["en", "fr", "es"];
+  const I18N = {
+    en: {
+      title: "The Cloud Bazaar", tagline: "Ten days of floating market to fund your voyage.",
+      play: "Play", rulesBtn: "How to play", lang: "Language", back: "Back", close: "Close",
+      day: "Day", of: "of", capital: "Capital", goal: "Voyage fund", coins: "coins",
+      goalBar: "Goal: {goal} coins", reached: "Goal reached!",
+      warehouse: "Warehouse", slots: "slots", free: "free",
+      phaseBuy: "Morning market", phaseServe: "Customers", phaseClose: "Closing",
+      forecastTitle: "Today's demand forecast",
+      forecastLine: "Customers look for {a} and {b} today — and pay +30% for them.",
+      forecastNone: "No strong demand today.",
+      forecastPenalty: "Other goods fetch −15% today.",
+      buyPrice: "buy", sellHint: "customers offer around {n}",
+      freshTag: "fresh", keepsTag: "keeps",
+      freshLose: "fresh loses value each night",
+      keepTag: "keeps its value",
+      trendUp: "pricier", trendDown: "cheaper", trendFlat: "stable",
+      inStock: "in stock", add: "Add", remove: "Remove",
+      cartTotal: "Purchases", afterCapital: "Capital after", warehouseUse: "Warehouse",
+      openShop: "Open the shop", cantAfford: "Not enough coins", noRoom: "Warehouse full",
+      nothingBought: "You bought nothing today.",
+      nextCustomer: "Next customer", serve: "Sell", turnAway: "Turn away",
+      wants: "asks for", budget: "budget", perUnit: "/unit",
+      deliver: "deliver", asked: "asked", stockLeft: "stock",
+      paymentNow: "They will pay", sellNothing: "nothing selected",
+      recapGain: "Earned", recapLost: "Nothing sold",
+      happySell: "Wonderful, thank you!", okSell: "That will do, thanks.", sadSell: "That's not much…",
+      awayLine: "Maybe tomorrow!",
+      dayEndTitle: "End of day {d}", sales: "Sales", purchases: "Purchases",
+      mooring: "Mooring fee", aged: "Fresh goods aged overnight ({n} item{s})",
+      capitalNow: "Capital", nextDay: "Sleep — next day",
+      bankruptTitle: "You could not pay the mooring fee.",
+      bankruptLine: "The market casts off and your bazaar drifts home.",
+      upgradeTitle: "A visit at dawn — choose one improvement",
+      upgradeOnce: "You may pick only one for the whole journey.",
+      upShelfT: "Pine shelf", upShelfD: "+2 warehouse slots (6 → 8).",
+      upSignT: "Sign balloon", upSignD: "Customers offer +15% on everything.",
+      upIceT: "Ice box", upIceD: "Fresh goods lose only 10% per night instead of 25%.",
+      choose: "Choose",
+      winTitle: "The voyage is funded!", loseTitle: "Not enough for the voyage.",
+      winLine: "Your bazaar casts off toward the new island.",
+      loseLine: "You needed {goal} coins — the ferry stays moored.",
+      statFinal: "Final capital", statRevenue: "Total earned", statServed: "Customers served",
+      statBest: "Best day", statDays: "Days played",
+      again: "Play again", sameSeed: "Retry same days",
+      seedLabel: "Days seed", best: "Best run",
+      rulesTitle: "How to play",
+      r1: "Each morning, read the demand forecast: two goods are wanted today — customers ask for them more often and pay +30%; other goods fetch −15%.",
+      r2: "Buy goods at the morning market. You start with 30 coins and 6 warehouse slots. Prices change every day.",
+      r3: "Then you welcome three customers. Each one asks for goods at a price per unit — combined orders ask for several goods.",
+      r4: "Choose how many units to hand over (you are paid exactly the listed price per unit) or turn them away.",
+      r5: "Fresh goods (berries, lanternfruit) lose 25% of their value each night. Ordinary goods (cloudwool, stormtea) keep theirs.",
+      r6: "Each evening, pay the 3-coin mooring fee. On day 5, choose one shop improvement.",
+      r7: "Reach 62 coins by the end of day 10 to fund the voyage. Every number shown is the real one used.",
+      freshBadge: "fresh", keepsBadge: "keeps",
+      helpTitle: "Help", resume: "Resume",
+      soundOn: "Sound on", soundOff: "Sound off",
+      custNames: {
+        kid: "Kite Kid", navigator: "The Navigator", shepherd: "The Cloudshepherd",
+        aeronaut: "The Aeronaut", baker: "The Sky Baker", peddler: "The Peddler"
+      },
+      custBlurbs: {
+        kid: "Small pocket, sweet tooth.", navigator: "Stocks up before a long trip.",
+        shepherd: "Buys in bulk, counts every coin.", aeronaut: "Daring, and generous.",
+        baker: "Only the freshest will do.", peddler: "Takes whatever you have, cheap."
+      },
+      goods: {
+        berries: "Mistberries", lantern: "Lanternfruit",
+        wool: "Cloudwool", tea: "Stormtea"
+      }
+    },
+    fr: {
+      title: "Le Bazar des nuages", tagline: "Dix jours de marché flottant pour financer le voyage.",
+      play: "Jouer", rulesBtn: "Comment jouer", lang: "Langue", back: "Retour", close: "Fermer",
+      day: "Jour", of: "sur", capital: "Capital", goal: "Caisse de voyage", coins: "pièces",
+      goalBar: "Objectif : {goal} pièces", reached: "Objectif atteint !",
+      warehouse: "Entrepôt", slots: "emplacements", free: "libres",
+      phaseBuy: "Marché du matin", phaseServe: "Clients", phaseClose: "Clôture",
+      forecastTitle: "Prévision de demande du jour",
+      forecastLine: "Les clients cherchent {a} et {b} aujourd'hui — et paient +30 %.",
+      forecastNone: "Pas de forte demande aujourd'hui.",
+      forecastPenalty: "Les autres marchandises se négocient −15 % aujourd'hui.",
+      buyPrice: "achat", sellHint: "les clients proposent ≈ {n}",
+      freshTag: "frais", keepsTag: "se garde",
+      freshLose: "frais : perd de la valeur chaque nuit",
+      keepTag: "garde sa valeur",
+      trendUp: "plus cher", trendDown: "moins cher", trendFlat: "stable",
+      inStock: "en stock", add: "Ajouter", remove: "Retirer",
+      cartTotal: "Achats", afterCapital: "Capital après", warehouseUse: "Entrepôt",
+      openShop: "Ouvrir la boutique", cantAfford: "Pas assez de pièces", noRoom: "Entrepôt plein",
+      nothingBought: "Vous n'avez rien acheté aujourd'hui.",
+      nextCustomer: "Client suivant", serve: "Vendre", turnAway: "Refuser",
+      wants: "demande", budget: "budget", perUnit: "/unité",
+      deliver: "livrer", asked: "demandé", stockLeft: "stock",
+      paymentNow: "Paiera", sellNothing: "rien de sélectionné",
+      recapGain: "Gagné", recapLost: "Rien vendu",
+      happySell: "Merveilleux, merci !", okSell: "Ça ira, merci.", sadSell: "Ce n'est pas grand-chose…",
+      awayLine: "Peut-être demain !",
+      dayEndTitle: "Fin de la journée {d}", sales: "Ventes", purchases: "Achats",
+      mooring: "Droit d'amarrage", aged: "Les marchandises fraîches ont vieilli ({n} article{s})",
+      capitalNow: "Capital", nextDay: "Dormir — jour suivant",
+      bankruptTitle: "Impossible de payer le droit d'amarrage.",
+      bankruptLine: "Le marché largue les amarres et votre bazar dérive vers la maison.",
+      upgradeTitle: "Une visite à l'aube — choisissez une amélioration",
+      upgradeOnce: "Une seule pour tout le voyage.",
+      upShelfT: "Étagère en pin", upShelfD: "+2 emplacements d'entrepôt (6 → 8).",
+      upSignT: "Ballon-enseigne", upSignD: "Les clients proposent +15 % sur tout.",
+      upIceT: "Glacière", upIceD: "Le frais ne perd que 10 % par nuit au lieu de 25 %.",
+      choose: "Choisir",
+      winTitle: "Le voyage est financé !", loseTitle: "Pas assez pour le voyage.",
+      winLine: "Votre bazar largue les amarres vers la nouvelle île.",
+      loseLine: "Il fallait {goal} pièces — le bac reste à quai.",
+      statFinal: "Capital final", statRevenue: "Total gagné", statServed: "Clients servis",
+      statBest: "Meilleure journée", statDays: "Jours joués",
+      again: "Rejouer", sameSeed: "Rejouer ces journées",
+      seedLabel: "Graine des journées", best: "Meilleure caisse",
+      rulesTitle: "Comment jouer",
+      r1: "Chaque matin, lis la prévision : deux marchandises sont recherchées — plus de clients les demandent, à +30 % ; les autres se négocient −15 %.",
+      r2: "Achète au marché du matin. Tu démarres avec 30 pièces et 6 emplacements. Les prix changent chaque jour.",
+      r3: "Puis accueille trois clients. Chacun propose un prix par unité — les commandes combinées portent sur plusieurs marchandises.",
+      r4: "Choisis combien d'unités livrer (tu es payé exactement le prix affiché par unité) ou refuse poliment.",
+      r5: "Le frais (baies, lanternes-fruit) perd 25 % de sa valeur chaque nuit. Le sec (laine, thé) se conserve.",
+      r6: "Chaque soir, paie les 3 pièces d'amarrage. Au 5e jour, choisis une amélioration de boutique.",
+      r7: "Atteins 62 pièces à la fin du 10e jour pour financer le voyage. Chaque chiffre affiché est le vrai.",
+      freshBadge: "frais", keepsBadge: "se garde",
+      helpTitle: "Aide", resume: "Reprendre",
+      soundOn: "Son activé", soundOff: "Son coupé",
+      custNames: {
+        kid: "Enfant au cerf-volant", navigator: "La Navigatrice", shepherd: "Le Berger de nuages",
+        aeronaut: "L'Aéronaute", baker: "La Boulangère du ciel", peddler: "Le Colporteur"
+      },
+      custBlurbs: {
+        kid: "Petite poche, dent sucrée.", navigator: "Fait des réserves avant un long voyage.",
+        shepherd: "Achète en gros, compte chaque pièce.", aeronaut: "Téméraire, et généreux.",
+        baker: "Ne veut que du très frais.", peddler: "Prend ce que tu as, à bas prix."
+      },
+      goods: {
+        berries: "Baies de brume", lantern: "Lanterne-fruit",
+        wool: "Laine de nuage", tea: "Thé d'orage"
+      }
+    },
+    es: {
+      title: "El Bazar de las nubes", tagline: "Diez días de mercado flotante para financiar el viaje.",
+      play: "Jugar", rulesBtn: "Cómo jugar", lang: "Idioma", back: "Volver", close: "Cerrar",
+      day: "Día", of: "de", capital: "Capital", goal: "Fondo del viaje", coins: "monedas",
+      goalBar: "Meta: {goal} monedas", reached: "¡Meta alcanzada!",
+      warehouse: "Almacén", slots: "huecos", free: "libres",
+      phaseBuy: "Mercado de la mañana", phaseServe: "Clientes", phaseClose: "Cierre",
+      forecastTitle: "Previsión de demanda de hoy",
+      forecastLine: "Los clientes buscan {a} y {b} hoy — y pagan +30%.",
+      forecastNone: "Sin demanda fuerte hoy.",
+      forecastPenalty: "Los demás productos se pagan −15% hoy.",
+      buyPrice: "compra", sellHint: "los clientes ofrecen ≈ {n}",
+      freshTag: "fresco", keepsTag: "se guarda",
+      freshLose: "fresco: pierde valor cada noche",
+      keepTag: "conserva su valor",
+      trendUp: "más caro", trendDown: "más barato", trendFlat: "estable",
+      inStock: "en stock", add: "Añadir", remove: "Quitar",
+      cartTotal: "Compras", afterCapital: "Capital tras", warehouseUse: "Almacén",
+      openShop: "Abrir la tienda", cantAfford: "Monedas insuficientes", noRoom: "Almacén lleno",
+      nothingBought: "Hoy no compraste nada.",
+      nextCustomer: "Siguiente cliente", serve: "Vender", turnAway: "Rechazar",
+      wants: "pide", budget: "presupuesto", perUnit: "/unidad",
+      deliver: "entregar", asked: "pedido", stockLeft: "stock",
+      paymentNow: "Pagará", sellNothing: "nada seleccionado",
+      recapGain: "Ganado", recapLost: "Nada vendido",
+      happySell: "¡Maravilloso, gracias!", okSell: "Servirá, gracias.", sadSell: "Es poco…",
+      awayLine: "¡Quizá mañana!",
+      dayEndTitle: "Fin del día {d}", sales: "Ventas", purchases: "Compras",
+      mooring: "Derecho de amarre", aged: "Lo fresco envejeció esta noche ({n} artículo{s})",
+      capitalNow: "Capital", nextDay: "Dormir — día siguiente",
+      bankruptTitle: "No pudiste pagar el derecho de amarre.",
+      bankruptLine: "El mercado suelta amarras y tu bazar deriva a casa.",
+      upgradeTitle: "Una visita al alba — elige una mejora",
+      upgradeOnce: "Solo una para todo el viaje.",
+      upShelfT: "Estantería de pino", upShelfD: "+2 huecos de almacén (6 → 8).",
+      upSignT: "Globo-rótulo", upSignD: "Los clientes ofrecen +15% en todo.",
+      upIceT: "Nevera", upIceD: "Lo fresco pierde solo 10% por noche, no 25%.",
+      choose: "Elegir",
+      winTitle: "¡El viaje está financiado!", loseTitle: "No alcanza para el viaje.",
+      winLine: "Tu bazar zarpa hacia la nueva isla.",
+      loseLine: "Necesitabas {goal} monedas — la barcaza sigue amarrada.",
+      statFinal: "Capital final", statRevenue: "Total ganado", statServed: "Clientes atendidos",
+      statBest: "Mejor día", statDays: "Días jugados",
+      again: "Jugar otra vez", sameSeed: "Repetir estos días",
+      seedLabel: "Semilla de los días", best: "Mejor caja",
+      rulesTitle: "Cómo jugar",
+      r1: "Cada mañana, lee la previsión: dos productos se buscan hoy — más clientes los piden, a +30%; los demás se pagan −15%.",
+      r2: "Compra en el mercado matinal. Empiezas con 30 monedas y 6 huecos. Los precios cambian a diario.",
+      r3: "Luego atiendes a tres clientes. Cada uno ofrece un precio por unidad — los pedidos combinados traen varios productos.",
+      r4: "Elige cuántas unidades entregar (te pagan exactamente el precio indicado por unidad) o rechaza con cortesía.",
+      r5: "Lo fresco (bayas, farolillos) pierde 25% de su valor cada noche. Lo seco (lana, té) se conserva.",
+      r6: "Cada tarde, paga las 3 monedas de amarre. El día 5, elige una mejora de la tienda.",
+      r7: "Alcanza 62 monedas al final del día 10 para financiar el viaje. Cada cifra mostrada es la real.",
+      freshBadge: "fresco", keepsBadge: "se guarda",
+      helpTitle: "Ayuda", resume: "Continuar",
+      soundOn: "Sonido activado", soundOff: "Sonido apagado",
+      custNames: {
+        kid: "Niño de la cometa", navigator: "La Navegante", shepherd: "El Pastor de nubes",
+        aeronaut: "El Aeronauta", baker: "La Panadera del cielo", peddler: "El Buhonero"
+      },
+      custBlurbs: {
+        kid: "Bolsillo pequeño, diente dulce.", navigator: "Hace provisiones antes de un largo viaje.",
+        shepherd: "Compra por mayor, cuenta cada moneda.", aeronaut: "Audaz, y generoso.",
+        baker: "Solo lo muy fresco.", peddler: "Toma lo que tengas, barato."
+      },
+      goods: {
+        berries: "Bayas de bruma", lantern: "Farolillo",
+        wool: "Lana de nube", tea: "Té de tormenta"
+      }
+    }
+  };
+  function tr(lang, key, vars) {
+    var d = I18N[lang] || I18N.en;
+    var s = d[key];
+    if (s === undefined) s = I18N.en[key];
+    if (s === undefined) return key;
+    if (vars) Object.keys(vars).forEach(function (k) {
+      s = s.split("{" + k + "}").join(String(vars[k]));
+    });
+    return s;
+  }
+
+  /* ---------- Utilitaires ---------- */
+  function ri(R, min, max) { return min + Math.floor(R() * (max - min + 1)); }
+  function pickWeighted(R, pairs) { // [[valeur, poids], ...]
+    var total = 0; pairs.forEach(function (p) { total += p[1]; });
+    var x = R() * total;
+    for (var i = 0; i < pairs.length; i++) { x -= pairs[i][1]; if (x <= 0) return pairs[i][0]; }
+    return pairs[pairs.length - 1][0];
+  }
+
+  /* ---------- Génération d'une journée ---------- */
+  function genDay(R, day, prevDemand) {
+    var mult = GOODS.map(function () {
+      return RULES.PRICE_STEPS[Math.floor(R() * RULES.PRICE_STEPS.length)];
+    });
+    // Deux marchandises en demande (distinctes, différentes de la veille).
+    var ids = GOODS.map(function (g) { return g.id; });
+    function pair() {
+      var a = ids[Math.floor(R() * ids.length)];
+      var b = ids[Math.floor(R() * ids.length)];
+      while (b === a) b = ids[Math.floor(R() * ids.length)];
+      return [a, b].sort();
+    }
+    var demand = pair();
+    if (prevDemand && demand.join() === prevDemand.join()) demand = pair();
+    // Garde-fou jour 1 : au moins une marchandise en demande est ordinaire
+    // (le sec se conserve : un départ impossible reste jouable).
+    if (day === 1 && GOODS[GIDX[demand[0]]].fresh && GOODS[GIDX[demand[1]]].fresh) {
+      demand = [demand[0], "wool"].sort();
+    }
+    var customers = [];
+    for (var c = 0; c < RULES.CUSTOMERS_PER_DAY; c++) {
+      customers.push(genCustomer(R, day, demand));
+    }
+    return { day: day, mult: mult, demand: demand, customers: customers };
+  }
+
+  function genCustomer(R, day, demand) {
+    var profile = PROFILES[pickWeighted(R, PROFILES.map(function (p) { return [PROFILES.indexOf(p), p.weight]; }))];
+    // Goûts : liste pondérée de marchandises (la demande du jour pèse plus lourd).
+    var pool = [];
+    if (profile.taste) {
+      profile.taste.forEach(function (t) {
+        var w = t[1] * (demand.indexOf(t[0]) >= 0 ? RULES.DEMAND_WEIGHT : 1);
+        pool.push([t[0], w]);
+      });
+    } else {
+      GOODS.forEach(function (g) {
+        var w = demand.indexOf(g.id) >= 0 ? RULES.DEMAND_WEIGHT : 1;
+        pool.push([g.id, w]);
+      });
+    }
+    var nLines = ri(R, profile.lines[0], profile.lines[1]);
+    var chosen = [];
+    var used = {};
+    for (var i = 0; i < nLines; i++) {
+      var g = pickWeighted(R, pool.filter(function (p) { return !used[p[0]]; }));
+      used[g] = true;
+      chosen.push(g);
+    }
+    var gen = profile.gen[0] + R() * (profile.gen[1] - profile.gen[0]);
+    var lines = chosen.map(function (gid) {
+      var qty = ri(R, profile.qty[0], profile.qty[1]);
+      var boost = demand.indexOf(gid) >= 0 ? RULES.DEMAND_OFFER : RULES.DEMAND_PENALTY;
+      var offer = Math.round(GOODS[GIDX[gid]].sell * boost * gen);
+      return { good: gid, qty: qty, offer: offer };
+    });
+    var budget = lines.reduce(function (s, l) { return s + l.qty * l.offer; }, 0);
+    return { profile: profile.id, lines: lines, budget: budget };
+  }
+
+  /* ---------- État ---------- */
+  function newGame(seed, lang) {
+    if (!LANGS.includes(lang)) lang = "en";
+    var R = mulberry32(hashSeed(String(seed)));
+    var days = [];
+    var prevDem = null;
+    for (var d = 1; d <= RULES.DAYS; d++) { var dd = genDay(R, d, prevDem); days.push(dd); prevDem = dd.demand; }
+    var stock = {};
+    GOODS.forEach(function (g) { stock[g.id] = []; }); // âges (en jours) par unité
+    return {
+      seed: String(seed), lang: lang, over: false, won: false, bankrupt: false,
+      day: 1, phase: "buy",           // buy | serve | close | upgrade | result
+      capital: RULES.START_CAPITAL,
+      stock: stock, cart: { berries: 0, lantern: 0, wool: 0, tea: 0 },
+      custIdx: 0, upgrade: null,
+      servedCount: 0, revenue: 0, bestDayGain: 0,
+      ledger: null,                   // journal du jour en cours
+      dayGains: [],                   // gain net par journée terminée
+      days: days, lastRecap: null
+    };
+  }
+
+  /* ---------- Marché du matin ---------- */
+  function buyPrice(state, goodId) {
+    var d = state.days[state.day - 1];
+    return Math.max(1, Math.round(GOODS[GIDX[goodId]].buy * d.mult[GIDX[goodId]]));
+  }
+  function yesterdayPrice(state, goodId) {
+    if (state.day <= 1) return null;
+    var d = state.days[state.day - 2];
+    return Math.max(1, Math.round(GOODS[GIDX[goodId]].buy * d.mult[GIDX[goodId]]));
+  }
+  function capacity(state) {
+    return RULES.CAPACITY + (state.upgrade === "shelf" ? RULES.SHELF_EXTRA : 0);
+  }
+  function stockCount(state) {
+    var n = 0;
+    GOODS.forEach(function (g) { n += state.stock[g.id].length; });
+    return n;
+  }
+  function cartCount(state) {
+    var n = 0;
+    GOODS.forEach(function (g) { n += state.cart[g.id]; });
+    return n;
+  }
+  function cartCost(state) {
+    var c = 0;
+    GOODS.forEach(function (g) { c += state.cart[g.id] * buyPrice(state, g.id); });
+    return c;
+  }
+  /* addToCart : retourne {ok, reason} — jamais d'achat invalide silencieux */
+  function addToCart(state, goodId, qty) {
+    qty = qty || 1;
+    if (qty < 0) qty = 0;
+    var room = capacity(state) - stockCount(state) - cartCount(state);
+    if (room <= 0) return { ok: false, reason: "noRoom" };
+    qty = Math.min(qty, room);
+    var afford = Math.floor((state.capital - cartCost(state)) / buyPrice(state, goodId));
+    qty = Math.min(qty, Math.max(0, afford));
+    if (qty <= 0) return { ok: false, reason: "cantAfford" };
+    state.cart[goodId] += qty;
+    return { ok: true, qty: qty };
+  }
+  function removeFromCart(state, goodId, qty) {
+    qty = Math.min(qty || 1, state.cart[goodId]);
+    state.cart[goodId] -= qty;
+    return { ok: true, qty: qty };
+  }
+  /* commitBuy : applique le panier (aucun changement si invalide) */
+  function commitBuy(state) {
+    var cost = cartCost(state);
+    var total = stockCount(state) + cartCount(state);
+    if (cost > state.capital || total > capacity(state)) return { ok: false };
+    GOODS.forEach(function (g) {
+      for (var i = 0; i < state.cart[g.id]; i++) state.stock[g.id].push(0); // âge 0
+      state.cart[g.id] = 0;
+    });
+    state.capital -= cost;
+    state.ledger = { purchases: cost, sales: [], fee: 0 };
+    state.phase = "serve";
+    state.custIdx = 0;
+    return { ok: true, cost: cost };
+  }
+
+  /* ---------- Fraîcheur et paiements ---------- */
+  function freshFactor(state, age) {
+    var decay = state.upgrade === "icebox" ? RULES.ICEBOX_DECAY : RULES.FRESH_DECAY;
+    return Math.max(RULES.FRESH_MIN, 100 - decay * age) / 100;
+  }
+  /* effectiveOffer : le ballon-enseigne majore les offres (à partir de son achat) */
+  function effectiveOffer(state, offer) {
+    return state.upgrade === "sign" ? Math.round(offer * RULES.SIGN_BONUS) : offer;
+  }
+  /* quoteLine : devis exact FIFO (les plus vieux partent d'abord), sans modifier l'état */
+  function quoteLine(state, line, deliverQty) {
+    var offer = effectiveOffer(state, line.offer);
+    var ages = state.stock[line.good].slice().sort(function (a, b) { return b - a; })
+      .slice(0, Math.min(deliverQty, line.qty, state.stock[line.good].length));
+    var units = ages.map(function (age) {
+      var f = freshFactor(state, age);
+      return { age: age, factor: f, pay: Math.round(offer * f) };
+    });
+    var sum = units.reduce(function (s, u) { return s + u.pay; }, 0);
+    return { offer: offer, units: units, sum: sum, count: units.length };
+  }
+  function customerQuote(state, cust, deliveries) {
+    var lines = cust.lines.map(function (l, i) {
+      var q = quoteLine(state, l, deliveries[i] || 0);
+      return { good: l.good, qty: l.qty, offer: q.offer, count: q.count, sum: q.sum, units: q.units };
+    });
+    var total = lines.reduce(function (s, l) { return s + l.sum; }, 0);
+    var budgetFresh = cust.lines.reduce(function (s, l) {
+      return s + l.qty * effectiveOffer(state, l.offer);
+    }, 0);
+    return { lines: lines, total: total, budget: budgetFresh };
+  }
+  /* sell : livre selon les quantités choisies. Validation stricte. */
+  function sell(state, deliveries) {
+    if (state.phase !== "serve") return { ok: false, reason: "phase" };
+    var cust = state.days[state.day - 1].customers[state.custIdx];
+    if (!cust) return { ok: false, reason: "cust" };
+    var quote = customerQuote(state, cust, deliveries);
+    // retire réellement les unités (FIFO : les plus vieilles d'abord)
+    quote.lines.forEach(function (l) {
+      var remaining = l.count;
+      var arr = state.stock[l.good].slice().sort(function (a, b) { return b - a; });
+      while (remaining > 0 && arr.length) {
+        var age = arr.shift();
+        var idx = state.stock[l.good].indexOf(age);
+        state.stock[l.good].splice(idx, 1);
+        remaining--;
+      }
+    });
+    var gain = quote.total;
+    if (gain > 0) { state.servedCount++; }
+    if (!state.ledger) state.ledger = { purchases: 0, sales: [], fee: 0 };
+    state.revenue += gain;
+    state.ledger.sales.push({ name: cust.profile, gain: gain, day: state.day });
+    state.capital += gain;
+    var mood = gain <= 0 ? "away" : (gain * 2 >= quote.budget ? "happy" : (gain * 4 >= quote.budget ? "ok" : "sad"));
+    state.lastRecap = { gain: gain, mood: mood, lines: quote.lines, budget: quote.budget };
+    nextCustomer(state);
+    return { ok: true, recap: state.lastRecap };
+  }
+  function turnAway(state) {
+    if (state.phase !== "serve") return { ok: false };
+    var cust = state.days[state.day - 1].customers[state.custIdx];
+    state.lastRecap = { gain: 0, mood: "away", lines: [], budget: cust ? cust.budget : 0 };
+    nextCustomer(state);
+    return { ok: true, recap: state.lastRecap };
+  }
+  function nextCustomer(state) {
+    state.custIdx++;
+    if (state.custIdx >= RULES.CUSTOMERS_PER_DAY) {
+      state.phase = "close";
+    }
+  }
+  function currentCustomer(state) {
+    if (state.phase !== "serve") return null;
+    return state.days[state.day - 1].customers[state.custIdx] || null;
+  }
+
+  /* ---------- Fin de journée ---------- */
+  function closeDay(state) {
+    if (state.phase !== "close") return { ok: false };
+    if (!state.ledger) state.ledger = { purchases: 0, sales: [], fee: 0 };
+    var fee = RULES.MOORING_FEE;
+    state.ledger.fee = fee;
+    state.capital -= fee;
+    var freshN = 0;
+    GOODS.forEach(function (g) {
+      if (g.fresh) {
+        freshN += state.stock[g.id].length;
+        state.stock[g.id] = state.stock[g.id].map(function (a) { return a + 1; });
+      }
+    });
+    state.dayGains.push(state.ledger.sales.reduce(function (s, x) { return s + x.gain; }, 0) - state.ledger.purchases - fee);
+    if (state.capital < 0) {
+      state.over = true; state.bankrupt = true; state.won = false; state.phase = "result";
+      return { ok: true, bankrupt: true };
+    }
+    if (state.day >= RULES.DAYS) {
+      state.over = true;
+      state.won = state.capital >= RULES.GOAL;
+      state.phase = "result";
+      return { ok: true, end: true, won: state.won };
+    }
+    state.day++;
+    state.phase = (state.day === RULES.UPGRADE_DAY && !state.upgrade) ? "upgrade" : "buy";
+    return { ok: true, freshAged: freshN, fee: fee };
+  }
+
+  /* ---------- Amélioration (jour 5) ---------- */
+  function chooseUpgrade(state, id) {
+    if (state.phase !== "upgrade") return { ok: false };
+    if (["shelf", "sign", "icebox"].indexOf(id) < 0) return { ok: false };
+    state.upgrade = id;
+    state.phase = "buy";
+    return { ok: true };
+  }
+
+  /* ---------- Vue pour l'UI ---------- */
+  function marketView(state) {
+    var d = state.days[state.day - 1];
+    return GOODS.map(function (g, i) {
+      var p = buyPrice(state, g.id), y = yesterdayPrice(state, g.id);
+      return {
+        id: g.id, fresh: g.fresh, price: p, yesterday: y,
+        trend: y === null ? "flat" : (p > y ? "up" : p < y ? "down" : "flat"),
+        inDemand: d.demand.indexOf(g.id) >= 0,
+        stock: state.stock[g.id].length, cart: state.cart[g.id],
+        baseSell: g.sell
+      };
+    });
+  }
+  function forecast(state) {
+    return state.days[state.day - 1].demand.slice();
+  }
+
+  return {
+    RULES: RULES, GOODS: GOODS, PROFILES: PROFILES, LANGS: LANGS, I18N: I18N,
+    tr: tr, newGame: newGame,
+    buyPrice: buyPrice, yesterdayPrice: yesterdayPrice,
+    capacity: capacity, stockCount: stockCount, cartCount: cartCount, cartCost: cartCost,
+    addToCart: addToCart, removeFromCart: removeFromCart, commitBuy: commitBuy,
+    freshFactor: freshFactor, effectiveOffer: effectiveOffer,
+    quoteLine: quoteLine, customerQuote: customerQuote,
+    sell: sell, turnAway: turnAway, currentCustomer: currentCustomer, nextCustomer: nextCustomer,
+    closeDay: closeDay, chooseUpgrade: chooseUpgrade,
+    marketView: marketView, forecast: forecast
+  };
+})();
+/*ENGINE-END*/
+
+/*Bazar-APP-START*/
+/* =========================================================================
+   Le Bazar des nuages — interface (DOM + SVG, aucun asset externe)
+   ========================================================================= */
+(function () {
+  "use strict";
+  var E = Bazar;
+  var state = null;
+  var lang = "en";
+  var muted = false;
+  var best = null;
+  var lastSeedShown = null;
+
+  /* ---------- persistance ---------- */
+  function store(key, val) {
+    try {
+      if (val === undefined) return localStorage.getItem("bazar." + key);
+      localStorage.setItem("bazar." + key, val);
+    } catch (e) { return null; }
+  }
+
+  /* ---------- audio ---------- */
+  var AC = null;
+  function ac() {
+    if (muted) return null;
+    try {
+      if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+      if (AC.state === "suspended") AC.resume();
+      return AC;
+    } catch (e) { return null; }
+  }
+  function tone(freq, dur, type, when, vol) {
+    var ctx = ac(); if (!ctx) return;
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || "triangle"; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol || 0.12, ctx.currentTime + (when || 0));
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (when || 0) + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(ctx.currentTime + (when || 0));
+    o.stop(ctx.currentTime + (when || 0) + dur + .02);
+  }
+  var SND = {
+    coin: function () { tone(880, .09, "square", 0, .07); tone(1320, .14, "square", .07, .06); },
+    bell: function () { tone(660, .18, "sine", 0, .1); tone(990, .22, "sine", .02, .07); },
+    whoosh: function () { tone(330, .3, "sine", 0, .06); tone(220, .35, "sine", .12, .06); },
+    plop: function () { tone(200, .12, "sine", 0, .09); },
+    win: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, .22, "triangle", i * .13, .09); }); },
+    lose: function () { tone(330, .3, "sine", 0, .09); tone(277, .35, "sine", .2, .09); tone(220, .5, "sine", .42, .09); }
+  };
+
+  /* ---------- utilitaires ---------- */
+  function t(key, vars) { return E.tr(lang, key, vars); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  }); }
+  function $(id) { return document.getElementById(id); }
+  function coinSVG(sz) {
+    sz = sz || 16;
+    return '<svg class="coin" width="' + sz + '" height="' + sz + '" viewBox="0 0 20 20" aria-hidden="true">' +
+      '<circle cx="10" cy="10" r="9" fill="#e8b64c" stroke="#a97d1e" stroke-width="2"/>' +
+      '<circle cx="10" cy="10" r="4.5" fill="none" stroke="#a97d1e" stroke-width="1.6"/></svg>';
+  }
+  function starSVG() {
+    return '<svg width="13" height="13" viewBox="0 0 20 20" aria-hidden="true" style="vertical-align:-1px">' +
+      '<path d="M10 1l2.6 5.6 6 .7-4.4 4.1 1.2 6L10 14.5 4.6 17.4l1.2-6L1.4 7.3l6-.7z" fill="#e2624b"/></svg>';
+  }
+  function goodIcon(id, sz) {
+    sz = sz || 28;
+    var body = "";
+    if (id === "berries") {
+      body = '<circle cx="10" cy="15" r="5" fill="#c9537f" stroke="#8f3057" stroke-width="1.5"/>' +
+        '<circle cx="17" cy="13" r="4.6" fill="#b34a72" stroke="#8f3057" stroke-width="1.5"/>' +
+        '<circle cx="14" cy="19" r="4.4" fill="#d76a92" stroke="#8f3057" stroke-width="1.5"/>' +
+        '<path d="M13 7q3-4 7-3" fill="none" stroke="#4d9e79" stroke-width="2.4" stroke-linecap="round"/>';
+    } else if (id === "lantern") {
+      body = '<path d="M12 3q0-2 3-2" fill="none" stroke="#4d9e79" stroke-width="2" stroke-linecap="round"/>' +
+        '<ellipse cx="12" cy="13" rx="7.5" ry="8.5" fill="#f0952f" stroke="#b06414" stroke-width="1.6"/>' +
+        '<ellipse cx="12" cy="13" rx="3.6" ry="5" fill="#ffd189"/>' +
+        '<rect x="9.6" y="2.6" width="4.8" height="2.6" rx="1" fill="#b06414"/>';
+    } else if (id === "wool") {
+      body = '<path d="M6 18a4 4 0 0 1-.6-7.9A5.4 5.4 0 0 1 16 8.7 4.2 4.2 0 0 1 17.5 17z" fill="#fdfdfd" stroke="#9db4c4" stroke-width="1.6"/>' +
+        '<path d="M5 14.5q4-2 7 0t7-.5M6 11.5q3.5-1.6 6.5.2" fill="none" stroke="#7fb2dd" stroke-width="1.6" stroke-linecap="round"/>';
+    } else { // tea
+      body = '<path d="M5 8h12l-1.4 11H6.4z" fill="#b0623d" stroke="#7d3f22" stroke-width="1.6"/>' +
+        '<path d="M5.6 8.2h10.8l-.5 4H6.1z" fill="#7fb2dd" opacity=".55"/>' +
+        '<path d="M8 5.5q1-1.6 0-3M12 5.5q1-1.6 0-3" fill="none" stroke="#5c6b7a" stroke-width="1.6" stroke-linecap="round"/>' +
+        '<path d="M18 9q3 1 0 5" fill="none" stroke="#7d3f22" stroke-width="1.8" stroke-linecap="round"/>';
+    }
+    return '<svg class="gicon" width="' + sz + '" height="' + sz + '" viewBox="0 0 24 24" aria-hidden="true">' + body + '</svg>';
+  }
+
+  /* ---------- scène ---------- */
+  function sceneSVG() {
+    var bunting = "";
+    var cols = ["#e2624b", "#e8b64c", "#6fbf9b", "#7fb2dd", "#e8a0b4"];
+    for (var i = 0; i < 9; i++) {
+      var x = 24 + i * 40;
+      bunting += '<path d="M' + x + ' 24 L' + (x + 20) + ' 24 L' + (x + 10) + ' 41 Z" fill="' + cols[i % 5] + '" stroke="#2f3b47" stroke-width="1.4"/>';
+    }
+    var rope = '<path d="M10 22 Q 206 30 402 22" fill="none" stroke="#2f3b47" stroke-width="1.6"/>';
+    function balloon(cx, cy, fill, deep, cls) {
+      return '<g class="' + cls + '">' +
+        '<line x1="' + cx + '" y1="' + (cy + 26) + '" x2="' + (cx < 200 ? 150 : 250) + '" y2="96" stroke="#8a6d3b" stroke-width="1.6"/>' +
+        '<ellipse cx="' + cx + '" cy="' + cy + '" rx="22" ry="26" fill="' + fill + '" stroke="#2f3b47" stroke-width="2"/>' +
+        '<path d="M' + cx + ' ' + (cy + 26) + ' l-4 7 h8 z" fill="' + deep + '" stroke="#2f3b47" stroke-width="1.4"/>' +
+        '<ellipse cx="' + (cx - 7) + '" cy="' + (cy - 9) + '" rx="5.5" ry="9" fill="#fff" opacity=".45"/></g>';
+    }
+    function cloud(cx, cy, s, cls) {
+      return '<g class="cloud ' + cls + '" opacity=".92" transform="translate(' + cx + ',' + cy + ') scale(' + s + ')">' +
+        '<ellipse cx="0" cy="0" rx="26" ry="14" fill="#fff"/>' +
+        '<ellipse cx="18" cy="4" rx="18" ry="10" fill="#fff"/>' +
+        '<ellipse cx="-18" cy="4" rx="16" ry="9" fill="#fff"/></g>';
+    }
+    return '<svg viewBox="0 0 412 260" role="img" aria-label="Bazaar">' +
+      '<circle cx="368" cy="34" r="17" fill="#e8b64c" stroke="#a97d1e" stroke-width="2"/>' +
+      '<g stroke="#e8b64c" stroke-width="2.4" stroke-linecap="round">' +
+      '<line x1="368" y1="7" x2="368" y2="12"/><line x1="368" y1="56" x2="368" y2="61"/>' +
+      '<line x1="338" y1="34" x2="344" y2="34"/><line x1="392" y1="34" x2="398" y2="34"/></g>' +
+      cloud(60, 60, 1, "c1") + cloud(300, 120, .8, "c2") + cloud(150, 190, .65, "c3") +
+      balloon(118, 52, "#e2624b", "#c74a35", "balloon-float b1") +
+      balloon(206, 44, "#e8b64c", "#a97d1e", "balloon-float b2") +
+      balloon(294, 52, "#7fb2dd", "#4f7ea8", "balloon-float b3") +
+      rope + bunting +
+      // cabine suspendue
+      '<g>' +
+      '<line x1="150" y1="96" x2="168" y2="128" stroke="#8a6d3b" stroke-width="2"/>' +
+      '<line x1="250" y1="96" x2="244" y2="128" stroke="#8a6d3b" stroke-width="2"/>' +
+      '<line x1="200" y1="92" x2="200" y2="126" stroke="#8a6d3b" stroke-width="2"/>' +
+      '<rect x="120" y="126" width="160" height="10" rx="4" fill="#b5502f" stroke="#2f3b47" stroke-width="2"/>' +
+      '<rect x="128" y="136" width="144" height="94" rx="8" fill="#fdf6e9" stroke="#2f3b47" stroke-width="2.4"/>' +
+      // auvent rayé
+      '<g>' +
+      '<path d="M112 136 q0 22 20 22 q14 0 14-14 q0 14 14 14 q14 0 14-14 q0 14 14 14 q14 0 14-14 q0 14 14 14 q14 0 14-14 q0 14 14 14 q14 0 14-14 q0 14 14 14 q14 0 14-14 q0 14 14 14 q20 0 20-22 z" fill="#e2624b" stroke="#2f3b47" stroke-width="2"/>' +
+      '</g>' +
+      // comptoir + marchandises
+      '<rect x="150" y="168" width="100" height="46" rx="6" fill="#7d5a3a" stroke="#2f3b47" stroke-width="2"/>' +
+      '<rect x="150" y="168" width="100" height="8" fill="#9a734b"/>' +
+      '<circle cx="172" cy="182" r="6" fill="#c9537f" stroke="#2f3b47" stroke-width="1.4"/>' +
+      '<ellipse cx="192" cy="182" rx="5" ry="7" fill="#f0952f" stroke="#2f3b47" stroke-width="1.4"/>' +
+      '<path d="M210 176a5 5 0 0 1-.4-9.9 6.8 6.8 0 0 1 9.9-1.4 5.2 5.2 0 0 1 1.4 10.5z" fill="#fff" stroke="#9db4c4" stroke-width="1.4" transform="translate(0,7)"/>' +
+      '<rect x="224" y="172" width="11" height="13" rx="2" fill="#b0623d" stroke="#2f3b47" stroke-width="1.4"/>' +
+      // enseigne
+      '<rect x="164" y="214" width="72" height="14" rx="4" fill="#6fbf9b" stroke="#2f3b47" stroke-width="1.6"/>' +
+      '</g></svg>';
+  }
+
+  /* ---------- clients SVG ---------- */
+  function customerSVG(profile, mood) {
+    var skins = { kid: "#f4c99a", navigator: "#eab68a", shepherd: "#f0c393", aeronaut: "#eec194", baker: "#f6cba5", peddler: "#dfae82" };
+    var outfits = { kid: "#7fb2dd", navigator: "#6fbf9b", shepherd: "#e8b64c", aeronaut: "#e2624b", baker: "#e8a0b4", peddler: "#9a8fb8" };
+    var skin = skins[profile] || "#f0c393";
+    var outfit = outfits[profile] || "#7fb2dd";
+    var hat = "";
+    if (profile === "kid") hat = '<path d="M26 26q10-14 24-2l-8-10z" fill="#e2624b" stroke="#2f3b47" stroke-width="1.5"/>'; // cerf-volant
+    if (profile === "navigator") hat = '<rect x="24" y="12" width="26" height="7" rx="3" fill="#2f3b47"/><rect x="31" y="4" width="12" height="9" rx="3" fill="#2f3b47"/>';
+    if (profile === "shepherd") hat = '<ellipse cx="38" cy="12" rx="22" ry="5" fill="#e8b64c" stroke="#2f3b47" stroke-width="1.5"/><ellipse cx="38" cy="8" rx="11" ry="7" fill="#e8b64c" stroke="#2f3b47" stroke-width="1.5"/>';
+    if (profile === "aeronaut") hat = '<rect x="22" y="8" width="32" height="12" rx="6" fill="#c74a35" stroke="#2f3b47" stroke-width="1.5"/><circle cx="30" cy="14" r="3.4" fill="#bde3f5" stroke="#2f3b47" stroke-width="1.4"/><circle cx="46" cy="14" r="3.4" fill="#bde3f5" stroke="#2f3b47" stroke-width="1.4"/>';
+    if (profile === "baker") hat = '<path d="M24 18q14-16 28 0z" fill="#fff" stroke="#2f3b47" stroke-width="1.5"/><circle cx="31" cy="13" r="2" fill="#e2624b"/><circle cx="45" cy="13" r="2" fill="#e2624b"/>';
+    if (profile === "peddler") hat = '<path d="M22 20q16-18 32 0z" fill="#9a8fb8" stroke="#2f3b47" stroke-width="1.5"/>';
+    var mouth = '<path d="M33 34q5 5 10 0" fill="none" stroke="#2f3b47" stroke-width="2" stroke-linecap="round"/>';
+    if (mood === "ok") mouth = '<line x1="33" y1="35" x2="43" y2="35" stroke="#2f3b47" stroke-width="2" stroke-linecap="round"/>';
+    if (mood === "sad" || mood === "away") mouth = '<path d="M33 37q5-5 10 0" fill="none" stroke="#2f3b47" stroke-width="2" stroke-linecap="round"/>';
+    var eyes = '<circle cx="31" cy="26" r="2.4" fill="#2f3b47"/><circle cx="45" cy="26" r="2.4" fill="#2f3b47"/>';
+    if (mood === "happy") eyes = '<path d="M28 26q3-4 6 0M42 26q3-4 6 0" fill="none" stroke="#2f3b47" stroke-width="2.2" stroke-linecap="round"/>';
+    var extra = "";
+    if (profile === "baker") extra = '<rect x="52" y="40" width="12" height="7" rx="3" fill="#d9995f" stroke="#2f3b47" stroke-width="1.4"/>';
+    if (profile === "shepherd") extra = '<line x1="56" y1="30" x2="52" y2="66" stroke="#8a6d3b" stroke-width="3" stroke-linecap="round"/>';
+    if (profile === "peddler") extra = '<rect x="50" y="36" width="16" height="22" rx="5" fill="#7d5a3a" stroke="#2f3b47" stroke-width="1.6"/>';
+    return '<svg viewBox="0 0 76 88" role="img" aria-label="customer">' +
+      '<ellipse cx="38" cy="82" rx="20" ry="5" fill="#2f3b47" opacity=".15"/>' +
+      '<rect x="24" y="40" width="28" height="34" rx="10" fill="' + outfit + '" stroke="#2f3b47" stroke-width="2"/>' +
+      '<circle cx="30" cy="52" r="4" fill="' + skin + '" stroke="#2f3b47" stroke-width="1.6"/>' +
+      '<circle cx="46" cy="52" r="4" fill="' + skin + '" stroke="#2f3b47" stroke-width="1.6"/>' +
+      '<circle cx="38" cy="28" r="16" fill="' + skin + '" stroke="#2f3b47" stroke-width="2"/>' +
+      hat + eyes + mouth + extra + '</svg>';
+  }
+  function upgIcon(id) {
+    if (id === "shelf") return '<svg class="upg-ico" viewBox="0 0 44 44"><rect x="6" y="8" width="32" height="6" rx="2" fill="#c9995f" stroke="#2f3b47" stroke-width="2"/><rect x="6" y="19" width="32" height="6" rx="2" fill="#c9995f" stroke="#2f3b47" stroke-width="2"/><rect x="6" y="30" width="32" height="6" rx="2" fill="#c9995f" stroke="#2f3b47" stroke-width="2"/><rect x="9" y="6" width="3" height="32" fill="#8a6d3b"/><rect x="32" y="6" width="3" height="32" fill="#8a6d3b"/></svg>';
+    if (id === "sign") return '<svg class="upg-ico" viewBox="0 0 44 44"><line x1="22" y1="30" x2="22" y2="38" stroke="#8a6d3b" stroke-width="2"/><ellipse cx="22" cy="15" rx="13" ry="15" fill="#e8b64c" stroke="#2f3b47" stroke-width="2"/><path d="M22 8l1.8 3.8 4.2.6-3 3 .7 4.2-3.7-2-3.7 2 .7-4.2-3-3 4.2-.6z" fill="#fff" stroke="#a97d1e" stroke-width="1.2"/></svg>';
+    return '<svg class="upg-ico" viewBox="0 0 44 44"><rect x="8" y="12" width="28" height="24" rx="4" fill="#bde3f5" stroke="#2f3b47" stroke-width="2"/><rect x="24" y="20" width="10" height="7" rx="2" fill="#7fb2dd" stroke="#2f3b47" stroke-width="1.6"/><path d="M14 18v8M10.8 22h6.4M30 28l4 4M34 28l-4 4" stroke="#4f7ea8" stroke-width="2" stroke-linecap="round"/></svg>';
+  }
+
+  /* ---------- écrans ---------- */
+  function show(id) {
+    document.querySelectorAll(".screen").forEach(function (s) { s.classList.remove("active"); });
+    $(id).classList.add("active");
+    window.scrollTo(0, 0);
+  }
+
+  function renderHome() {
+    $("home").innerHTML =
+      '<div class="title-art">' + sceneSVG() + '</div>' +
+      '<h1 class="game-title">' + esc(t("title")) + '</h1>' +
+      '<p class="tagline">' + esc(t("tagline")) + '</p>' +
+      '<div class="home-buttons">' +
+      '<button class="btn-primary btn-big" data-action="play">' + esc(t("play")) + '</button>' +
+      '<button data-action="rules">' + esc(t("rulesBtn")) + '</button>' +
+      '<div><select id="langsel" aria-label="' + esc(t("lang")) + '">' +
+      E.LANGS.map(function (l) { return '<option value="' + l + '"' + (l === lang ? " selected" : "") + '>' + l.toUpperCase() + '</option>'; }).join("") +
+      '</select></div>' +
+      '</div>' +
+      '<div class="home-meta">' +
+      (best !== null ? '<span>' + esc(t("best")) + ' ' + best + ' ' + coinSVG(14) + '</span>' : "") +
+      '</div>';
+    $("home").querySelector("#langsel").addEventListener("change", function (e) {
+      lang = e.target.value; store("lang", lang); renderHome();
+    });
+    show("home");
+  }
+
+  function renderRulesModal() {
+    var items = ["r1", "r2", "r3", "r4", "r5", "r6", "r7"].map(function (k) { return "<li>" + esc(t(k)) + "</li>"; }).join("");
+    openModal('<h2>' + esc(t("rulesTitle")) + '</h2><ul class="rules-list">' + items + '</ul>' +
+      '<div class="btn-row" style="margin-top:12px"><button class="btn-primary" data-action="close-modal">' + esc(t("close")) + '</button></div>');
+  }
+
+  function openModal(html) {
+    var back = document.createElement("div");
+    back.className = "modal-back"; back.id = "modal";
+    back.innerHTML = '<div class="modal">' + html + '</div>';
+    document.body.appendChild(back);
+  }
+  function closeModal() { var m = $("modal"); if (m) m.remove(); }
+
+  /* ---------- barre de partie ---------- */
+  function renderBar() {
+    var pct = Math.max(0, Math.min(100, Math.round(state.capital / E.RULES.GOAL * 100)));
+    var reached = state.capital >= E.RULES.GOAL;
+    $("bar").innerHTML =
+      '<div class="gamebar">' +
+      '<span class="pill">' + esc(t("day")) + ' ' + state.day + '/' + E.RULES.DAYS + '</span>' +
+      '<span class="pill">' + coinSVG(14) + ' ' + state.capital + '</span>' +
+      '<div class="goalwrap" role="progressbar" aria-valuemin="0" aria-valuemax="' + E.RULES.GOAL + '" aria-valuenow="' + state.capital + '">' +
+      '<div class="goalbar" style="width:' + pct + '%"></div>' +
+      '<div class="goallabel">' + (reached ? esc(t("reached")) : state.capital + ' / ' + E.RULES.GOAL) + '</div></div>' +
+      '<div class="barbtns">' +
+      '<button class="icon-btn" data-action="sound" title="sound" aria-label="sound">' + (muted ? "🔇" : "🔊") + '</button>' +
+      '<button class="icon-btn" data-action="rules2" title="?" aria-label="help">?</button>' +
+      '</div></div>';
+  }
+
+  function renderScene(mood, showCust) {
+    var custHtml = showCust
+      ? '<div class="customer-slot enter">' + customerSVG(state._custProfile || "kid", mood || "ok") + '</div>'
+      : "";
+    $("scene").innerHTML = sceneSVG() + custHtml +
+      '<div class="mood-bubble' + (mood ? " show" : "") + '" id="moodbubble"></div>';
+  }
+
+  /* ---------- phase achat ---------- */
+  function renderBuy() {
+    renderBar(); renderScene(null, false);
+    var mv = E.marketView(state);
+    var dem = E.forecast(state);
+    var demNames = dem.map(function (g) { return esc(E.I18N[lang].goods[g]); });
+    var forecast = '<div class="forecast"><b>' + esc(t("forecastTitle")) + '</b><br>' +
+      t("forecastLine", { a: demNames[0], b: demNames[1] }) +
+      '<br><span class="star">▼</span> ' + esc(t("forecastPenalty")) + '</div>';
+    var cards = mv.map(function (g) {
+      var trendCls = g.trend === "up" ? "up" : g.trend === "down" ? "down" : "flat";
+      var stockAges = "";
+      var freshStock = state.stock[g.id];
+      if (freshStock.length) {
+        var ages = freshStock.slice().sort(function (a, b) { return a - b; }).map(function (a) {
+          return Math.round(E.freshFactor(state, a) * 100) + "%";
+        }).join(" · ");
+        stockAges = " (" + ages + ")";
+      }
+      return '<div class="good-card' + (g.inDemand ? " demand" : "") + '">' +
+        (g.inDemand ? '<span class="demand-badge">' + starSVG() + " " + (lang === "fr" ? "en demande" : lang === "es" ? "buscado" : "in demand") + '</span>' : "") +
+        '<div class="good-head">' + goodIcon(g.id, 34) +
+        '<div><div class="good-name">' + esc(E.I18N[lang].goods[g.id]) + '</div>' +
+        '<span class="tag ' + (g.fresh ? "fresh" : "keeps") + '">' + esc(t(g.fresh ? "freshBadge" : "keepsBadge")) + '</span></div></div>' +
+        '<div class="price-row"><span class="price">' + g.price + '</span><span>' + coinSVG(13) + '</span>' +
+        '<span class="trend ' + trendCls + '">' + esc(t("trend" + (g.trend === "up" ? "Up" : g.trend === "down" ? "Down" : "Flat"))) + '</span></div>' +
+        '<div class="stock-row">' + esc(t("inStock")) + ' : ' + g.stock + stockAges + '</div>' +
+        '<div class="stepper">' +
+        '<button data-action="rem" data-arg="' + g.id + '" aria-label="' + esc(t("remove")) + '" ' + (g.cart ? "" : "disabled") + '>−</button>' +
+        '<span class="qty">' + g.cart + '</span>' +
+        '<button data-action="add" data-arg="' + g.id + '" aria-label="' + esc(t("add")) + '">+</button></div>' +
+        '</div>';
+    }).join("");
+    var cost = E.cartCost(state);
+    var after = state.capital - cost;
+    var used = E.stockCount(state) + E.cartCount(state);
+    var cap = E.capacity(state);
+    var warn = (after < 0) ? '<span class="warn">' + esc(t("cantAfford")) + '</span>' :
+      (used > cap) ? '<span class="warn">' + esc(t("noRoom")) + '</span>' : "";
+    $("phase").innerHTML =
+      '<div class="panel"><h2>' + esc(t("phaseBuy")) + ' · ' + esc(t("day")) + ' ' + state.day + '</h2>' + forecast +
+      '<div class="market">' + cards + '</div>' +
+      '<div class="cartbar"><span>' + esc(t("cartTotal")) + ' : −' + cost + ' ' + coinSVG(13) +
+      ' &nbsp;·&nbsp; ' + esc(t("afterCapital")) + ' : ' + Math.max(0, after) + '</span>' +
+      '<span>' + esc(t("warehouseUse")) + ' : ' + used + '/' + cap + ' ' + warn + '</span></div>' +
+      '<div class="btn-row" style="margin-top:12px">' +
+      '<button class="btn-primary btn-big" data-action="open-shop">' + esc(t("openShop")) + '</button></div>' +
+      '</div>';
+    $("phase").dataset.phase = "buy";
+  }
+
+  /* ---------- phase clients ---------- */
+  var deliver = []; // quantités choisies par ligne
+
+  function renderServe() {
+    renderBar();
+    var cust = E.currentCustomer(state);
+    if (!cust) { return; }
+    state._custProfile = cust.profile;
+    renderScene("ok", true);
+    var quote = E.customerQuote(state, cust, deliver);
+    var name = esc(E.I18N[lang].custNames[cust.profile]);
+    var blurb = esc(E.I18N[lang].custBlurbs[cust.profile]);
+    var lines = cust.lines.map(function (l, i) {
+      var q = quote.lines[i];
+      var maxDeliver = Math.min(l.qty, state.stock[l.good].length);
+      var mathBits = q.units.map(function (u) { return u.pay + (u.factor < 1 ? " (" + Math.round(u.factor * 100) + "%)" : ""); }).join(" + ");
+      return '<div class="order-line">' + goodIcon(l.good, 28) +
+        '<div class="order-main"><div class="order-good">' + esc(E.I18N[lang].goods[l.good]) + '</div>' +
+        '<div class="order-offer">' + esc(t("asked")) + ' ×' + l.qty + ' — ' + q.offer + ' ' + coinSVG(12) + " " + esc(t("perUnit")) + '</div>' +
+        (mathBits ? '<div class="order-math">= ' + mathBits + (q.count > 1 ? " = " + q.sum : "") + '</div>' : "") +
+        '</div>' +
+        '<div class="order-qty stepper">' +
+        '<button data-action="dec" data-arg="' + i + '" ' + ((deliver[i] || 0) > 0 ? "" : "disabled") + '>−</button>' +
+        '<span class="qty">' + (deliver[i] || 0) + '<span style="font-size:.7em;color:var(--ink-soft)">/' + l.qty + '</span></span>' +
+        '<button data-action="inc" data-arg="' + i + '" ' + ((deliver[i] || 0) < maxDeliver ? "" : "disabled") + '>+</button>' +
+        '</div></div>';
+    }).join("");
+    $("phase").innerHTML =
+      '<div class="cust-card">' +
+      '<div class="cust-head"><div class="cust-avatar">' + customerSVG(cust.profile, "ok") + '</div>' +
+      '<div><div class="cust-name">' + name + '</div><div class="cust-blurb">' + blurb + '</div></div>' +
+      '<div style="margin-left:auto;text-align:right;font-size:.8rem;color:var(--ink-soft)">' + esc(t("budget")) + '<br><b style="font-size:1.05rem;color:var(--ink)">' + quote.budget + ' ' + coinSVG(13) + '</b></div></div>' +
+      lines +
+      '<div class="payrow"><span>' + esc(t("paymentNow")) + '</span><span class="amount">' + quote.total + ' ' + coinSVG(16) + '</span></div>' +
+      '<div class="cust-actions">' +
+      '<button class="btn-primary btn-big" data-action="sell" ' + (quote.total > 0 ? "" : "disabled") + '>' + esc(t("serve")) + '</button>' +
+      '<button data-action="away">' + esc(t("turnAway")) + '</button></div>' +
+      '</div>';
+    $("phase").dataset.phase = "serve";
+  }
+
+  function renderRecap() {
+    renderBar();
+    var r = state.lastRecap;
+    var moodKey = r.mood === "happy" ? "happySell" : r.mood === "ok" ? "okSell" : r.mood === "sad" ? "sadSell" : "awayLine";
+    renderScene(r.mood, true);
+    var bubble = $("moodbubble");
+    if (bubble) bubble.textContent = t(moodKey);
+    var last = state.custIdx >= E.RULES.CUSTOMERS_PER_DAY;
+    $("phase").innerHTML =
+      '<div class="panel recap-card">' +
+      (r.gain > 0
+        ? '<div class="amount">+' + r.gain + ' ' + coinSVG(22) + '</div><div class="recap-mood">' + esc(t(moodKey)) + '</div>'
+        : '<div class="amount sad">0 ' + coinSVG(22) + '</div><div class="recap-mood">' + esc(t(moodKey)) + '</div>') +
+      '<button class="btn-mint btn-big" data-action="' + (last ? "end-day" : "next-cust") + '">' +
+      esc(t(last ? "phaseClose" : "nextCustomer")) + '</button></div>';
+    $("phase").dataset.phase = "recap";
+  }
+
+  /* ---------- fin de journée ---------- */
+  function renderDayEnd(dayNum, info) {
+    var rows = "";
+    var l = state.ledger;
+    if (l.purchases > 0) rows += '<tr><td>' + esc(t("purchases")) + '</td><td class="num minus">−' + l.purchases + '</td></tr>';
+    l.sales.forEach(function (s, i) {
+      var nm = E.I18N[lang].custNames[s.name] || s.name;
+      rows += '<tr><td>' + esc(t("sales")) + ' · ' + esc(nm) + '</td><td class="num plus">+' + s.gain + '</td></tr>';
+    });
+    rows += '<tr><td>' + esc(t("mooring")) + '</td><td class="num minus">−' + E.RULES.MOORING_FEE + '</td></tr>';
+    var aged = info && info.freshAged ? t("aged", { n: info.freshAged, s: info.freshAged > 1 ? "s" : "" }) : "";
+    openModal('<h2>' + esc(t("dayEndTitle", { d: dayNum })) + '</h2>' +
+      '<table class="ledger">' + rows +
+      '<tr class="total"><td>' + esc(t("capitalNow")) + '</td><td class="num">' + state.capital + ' ' + coinSVG(14) + '</td></tr></table>' +
+      (aged ? '<p class="hint">' + esc(aged) + '</p>' : "") +
+      '<div class="btn-row"><button class="btn-primary btn-big" data-action="next-day">' + esc(t("nextDay")) + '</button></div>');
+  }
+
+  /* ---------- amélioration ---------- */
+  function renderUpgrade() {
+    renderBar(); renderScene(null, false);
+    var ups = [
+      { id: "shelf", title: "upShelfT", desc: "upShelfD" },
+      { id: "sign", title: "upSignT", desc: "upSignD" },
+      { id: "icebox", title: "upIceT", desc: "upIceD" }
+    ].map(function (u) {
+      return '<div class="upg-card">' + upgIcon(u.id) +
+        '<div><b>' + esc(t(u.title)) + '</b><div class="hint">' + esc(t(u.desc)) + '</div></div>' +
+        '<button class="btn-mint" data-action="upg" data-arg="' + u.id + '">' + esc(t("choose")) + '</button></div>';
+    }).join("");
+    $("phase").innerHTML =
+      '<div class="panel"><h2>' + esc(t("upgradeTitle")) + '</h2>' +
+      '<p class="hint">' + esc(t("upgradeOnce")) + '</p><div class="upgrades">' + ups + '</div></div>';
+    $("phase").dataset.phase = "upgrade";
+  }
+
+  /* ---------- résultat ---------- */
+  function renderResult() {
+    var won = state.won;
+    var bestDay = state.dayGains.length ? Math.max.apply(null, state.dayGains) : 0;
+    if (best === null || state.capital > best) {
+      best = state.capital; store("best", String(best));
+    }
+    $("result").innerHTML =
+      '<div class="scene' + (won ? " lift-off" : "") + '" style="border:none;background:none;box-shadow:none">' + sceneSVG() + '</div>' +
+      '<h2 class="result-title">' + esc(t(won ? "winTitle" : state.bankrupt ? "bankruptTitle" : "loseTitle")) + '</h2>' +
+      '<p class="tagline">' + esc(t(state.bankrupt ? "bankruptLine" : won ? "winLine" : "loseLine", { goal: E.RULES.GOAL })) + '</p>' +
+      '<div class="stats">' +
+      '<div class="stat"><div class="v">' + state.capital + '</div><div class="k">' + esc(t("statFinal")) + '</div></div>' +
+      '<div class="stat"><div class="v">' + state.revenue + '</div><div class="k">' + esc(t("statRevenue")) + '</div></div>' +
+      '<div class="stat"><div class="v">' + state.servedCount + '</div><div class="k">' + esc(t("statServed")) + '</div></div>' +
+      '<div class="stat"><div class="v">' + (bestDay > 0 ? "+" + bestDay : bestDay) + '</div><div class="k">' + esc(t("statBest")) + '</div></div>' +
+      '</div>' +
+      '<div class="btn-row">' +
+      '<button class="btn-primary btn-big" data-action="again">' + esc(t("again")) + '</button>' +
+      '<button data-action="same-seed">' + esc(t("sameSeed")) + '</button></div>' +
+      '<p class="home-meta">' + esc(t("seedLabel")) + ' : ' + esc(state.seed) + '</p>';
+    show("result");
+    if (won) { SND.win(); confetti(); } else { SND.lose(); }
+  }
+
+  function confetti() {
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var c = document.createElement("div");
+    c.className = "confetti";
+    var cols = ["#e2624b", "#e8b64c", "#6fbf9b", "#7fb2dd", "#e8a0b4"];
+    for (var i = 0; i < 60; i++) {
+      var p = document.createElement("i");
+      p.style.left = (Math.random() * 100) + "vw";
+      p.style.background = cols[i % 5];
+      p.style.animationDuration = (1.6 + Math.random() * 1.8) + "s";
+      p.style.animationDelay = (Math.random() * .8) + "s";
+      c.appendChild(p);
+    }
+    document.body.appendChild(c);
+    setTimeout(function () { c.remove(); }, 4200);
+  }
+
+  /* ---------- flux de jeu ---------- */
+  function newRun(seed) {
+    state = E.newGame(seed, lang);
+    lastSeedShown = seed;
+    show("game");
+    if (state.phase === "upgrade") renderUpgrade(); else renderBuy();
+  }
+
+  function startServePhase() {
+    deliver = [];
+    renderServe();
+    SND.bell();
+  }
+
+  /* ---------- events (délégation) ---------- */
+  document.addEventListener("click", function (ev) {
+    var el = ev.target.closest("[data-action]");
+    if (!el) return;
+    var action = el.getAttribute("data-action");
+    var arg = el.getAttribute("data-arg");
+    ac(); // déverrouille l'audio au premier geste
+    switch (action) {
+      case "play": newRun(String(Math.floor(Math.random() * 1e9))); SND.whoosh(); break;
+      case "rules": renderRulesModal(); break;
+      case "rules2": renderRulesModal(); break;
+      case "close-modal": closeModal(); break;
+      case "sound":
+        muted = !muted; store("muted", muted ? "1" : "0");
+        renderBar(); if ($("phase").dataset.phase === "buy") renderBuy();
+        if (state && state.phase === "serve") renderServe();
+        if (state && state.phase === "upgrade") renderUpgrade();
+        break;
+      case "add": E.addToCart(state, arg, 1); SND.plop(); renderBuy(); break;
+      case "rem": E.removeFromCart(state, arg, 1); renderBuy(); break;
+      case "open-shop":
+        E.commitBuy(state); // panier vide autorisé : journée sans achat
+        startServePhase();
+        break;
+      case "inc":
+        deliver[+arg] = (deliver[+arg] || 0) + 1; renderServe(); break;
+      case "dec":
+        deliver[+arg] = Math.max(0, (deliver[+arg] || 0) - 1); renderServe(); break;
+      case "sell":
+        var r = E.sell(state, deliver);
+        if (r.ok) { SND.coin(); renderRecap(); }
+        break;
+      case "away":
+        E.turnAway(state); SND.plop(); renderRecap(); break;
+      case "next-cust":
+        deliver = []; renderServe(); SND.bell(); break;
+      case "end-day": {
+        closeModal();
+        var dayNum = state.day;
+        var info = E.closeDay(state);
+        if (state.over) { renderResult(); }
+        else {
+          renderDayEnd(dayNum, info); // état déjà avancé : on affiche le jour clôturé
+          SND.whoosh();
+        }
+        break;
+      }
+      case "next-day":
+        closeModal();
+        if (state.phase === "upgrade") renderUpgrade(); else renderBuy();
+        break;
+      case "upg":
+        E.chooseUpgrade(state, arg); SND.coin(); renderBuy(); break;
+      case "again": newRun(String(Math.floor(Math.random() * 1e9))); break;
+      case "same-seed": newRun(state.seed); break;
+    }
+  });
+
+  /* ---------- boot ---------- */
+  function boot() {
+    lang = store("lang") || "en";
+    if (["en", "fr", "es"].indexOf(lang) < 0) lang = "en";
+    muted = store("muted") === "1";
+    var b = store("best"); if (b !== null && !isNaN(+b)) best = +b;
+    var q = new URLSearchParams(location.search);
+    if (q.get("lang") && E.LANGS.indexOf(q.get("lang")) >= 0) lang = q.get("lang");
+    var app = document.getElementById("app");
+    app.innerHTML =
+      '<section id="home" class="screen"></section>' +
+      '<section id="game" class="screen"><div id="bar"></div><div class="scene" id="scene"></div><main id="phase"></main></section>' +
+      '<section id="result" class="screen"></section>';
+    renderHome();
+    if (q.get("seed")) newRun(q.get("seed"));
+    // QA : hook lecture seule + pilotage
+    window.__bazar = {
+      get state() { return state; },
+      E: E,
+      lang: function () { return lang; },
+      setLang: function (l) { lang = l; if (state) { state.lang = l; } renderHome(); },
+      actions: function (a, arg) { document.querySelector('[data-action="' + a + '"]' + (arg ? '[data-arg="' + arg + '"]' : "")).click(); }
+    };
+    document.body.dataset.booted = "1";
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();
+/*Bazar-APP-END*/
+
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "title": "The Cloud Bazaar",
+  "description": "Run a balloon-hung stall on a floating market: read the demand forecast, buy four goods, serve three customers a day, keep fresh stock from losing value — and fund the voyage to a new island in ten days.",
+  "entrypoint": "index.html",
+  "license": "MIT",
+  "genre": ["strategy", "management"],
+  "themes": ["market", "balloons", "sky", "shopkeeping"],
+  "controls": ["Tap + / − to buy goods at the morning market", "Tap + / − per order line to choose how many units to sell", "Tap Sell or Turn away for each customer", "Works with mouse, keyboard-free, and touch"],
+  "credits": ["Concept: Cédric Bernadac, with AI agents", "Game made by Z-Code"],
+  "cover": "cover.png"
+}

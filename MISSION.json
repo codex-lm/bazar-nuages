@@ -1,0 +1,38 @@
+{
+  "mission": "Le Bazar des nuages — mission ponctuelle Z Code (spec Cédric, 31/10/2026). Boutique suspendue sur un marché flottant : 10 journées, achats guidés par une prévision de demande, 3 clients/jour, frais fixes, 1 amélioration au 5e jour, objectif de capital après 10 jours.",
+  "status": "in-progress",
+  "startedAt": "2026-10-31T23:22+01:00",
+  "workshop": {
+    "gameDir": "C:/dev/zcode-games/games/bazar-nuages",
+    "devDir": "C:/dev/zcode-games/games/bazar-nuages-dev (build, tests, simulateur, couverture — hors dépôt)",
+    "evidence": "C:/dev/zcode-games/evidence/bazar-nuages/",
+    "lock": "_private/lock-mission-bazar-nuages-20261031",
+    "scheduledTasksPreserved": "oui — automations 9h improvement et 14h30 creation vérifiées intactes via CronList, non modifiées"
+  },
+  "game": {
+    "name": "The Cloud Bazaar",
+    "namesLocalized": { "en": "The Cloud Bazaar", "fr": "Le Bazar des nuages", "es": "El Bazar de las nubes" },
+    "stack": "HTML/JS/CSS statique autonome, un seul index.html 100 % inline (~74 Kio), SVG inline, WebAudio synthétisé, localStorage try/catch, hook QA window.__bazar",
+    "rules": {
+      "days": 10, "startCapital": 30, "warehouseSlots": 6, "customersPerDay": 3,
+      "goods": 4, "customerProfiles": 6, "mooringFee": 3, "goal": 62,
+      "demand": "2 marchandises/jour : +30 % d'offre et demandées ×5 ; les autres −15 % ; paire différente de la veille",
+      "fresh": "frais : −25 %/nuit (plancher 25 %) ; glacière : −10 %",
+      "upgradeDay5": ["shelf +2 slots", "sign +15 % offres", "icebox frais −10 %/nuit"]
+    },
+    "artFamily": "« Marché céleste » — palette claire et festive : ciel #dceef8/#f3faf5, crème #fdf6e9, encre #2f3b47, corail #e2624b, moutarde #e8b64c, menthe #6fbf9b, bleu ballon #7fb2dd, rose #e8a0b4. Distincte du site LOB7 (nuit indigo interdite) et des familles récentes (manga N&B, désert midi, charpente, espace graphite, piscine)."
+  },
+  "tests": {
+    "node": "18/18 contre le index.html livré (achats/bornes, vente partielle, FIFO fraîcheur, ballon-enseigne, frais, porte jour 5, seuil victoire 61/62, banqueroute, garde-fou jour 1, budget=Σ, cohérence prix 400 graines, déterminisme, parité i18n, économie bornée 300 graines)",
+    "simulation": "600 graines × 5 stratégies (résultats complets dans bazar-nuages-dev/sim-results.json) : forecast 81 % / dry-only 67 % / fresh-only 14 % / chaotic 0 % / never-buy 0 % ; capital max observé 249 (pas de bénéfice infini) ; passif termine toujours à 0 exactement (aucune ruine par le tirage)"
+  },
+  "localPlay": {
+    "browser": "Chromium (IAB) 420×860 et 900×720, http://127.0.0.1:8931",
+    "run": "Partie complète FR graine mission1 : VICTOIRE 102 pièces (objectif 62), 14 clients servis, étagère choisie jour 5 ; vente partielle vérifiée ligne à ligne (= 13) ; refus client ; modale fin de journée exacte ; rejouer (nouvelle graine) ; EN et ES vérifiés ; meilleure caisse persistée",
+    "visualGate": "Analyse d'image de la scène et de la couverture : PASS après 2 itérations (fanions redessinés dans le cadre, guirlande devant les ballons, soleil dégagé, titre couverture déplacé)",
+    "screenshots": ["01-accueil-EN.png", "02-marche-FR.png", "03-client-EN.png", "04-mercado-ES.png", "05-victoire-FR.png", "06-marche-FR-desktop.png"]
+  },
+  "repo": { "status": "pending" },
+  "lob7": { "status": "pending" },
+  "notes": []
+}

@@ -1,38 +1,75 @@
 {
   "mission": "Le Bazar des nuages — mission ponctuelle Z Code (spec Cédric, 31/10/2026). Boutique suspendue sur un marché flottant : 10 journées, achats guidés par une prévision de demande, 3 clients/jour, frais fixes, 1 amélioration au 5e jour, objectif de capital après 10 jours.",
-  "status": "in-progress",
+  "status": "done",
   "startedAt": "2026-10-31T23:22+01:00",
+  "closedAt": "2026-11-01T00:15+01:00",
   "workshop": {
     "gameDir": "C:/dev/zcode-games/games/bazar-nuages",
     "devDir": "C:/dev/zcode-games/games/bazar-nuages-dev (build, tests, simulateur, couverture — hors dépôt)",
-    "evidence": "C:/dev/zcode-games/evidence/bazar-nuages/",
-    "lock": "_private/lock-mission-bazar-nuages-20261031",
-    "scheduledTasksPreserved": "oui — automations 9h improvement et 14h30 creation vérifiées intactes via CronList, non modifiées"
+    "evidence": "C:/dev/zcode-games/evidence/bazar-nuages/ (7 PNG)",
+    "lock": "_private/lock-mission-bazar-nuages-20261031 (levé à la clôture)",
+    "scheduledTasksPreserved": "oui — automations 9h improvement et 14h30 creation vérifiées intactes via CronList, jamais modifiées"
   },
   "game": {
     "name": "The Cloud Bazaar",
     "namesLocalized": { "en": "The Cloud Bazaar", "fr": "Le Bazar des nuages", "es": "El Bazar de las nubes" },
-    "stack": "HTML/JS/CSS statique autonome, un seul index.html 100 % inline (~74 Kio), SVG inline, WebAudio synthétisé, localStorage try/catch, hook QA window.__bazar",
+    "stack": "HTML/JS/CSS statique autonome, un seul index.html 100 % inline (~74 Kio), SVG inline, WebAudio synthétisé, localStorage try/catch, hook QA window.__bazar, ?seed= et ?lang= reproductibles",
     "rules": {
       "days": 10, "startCapital": 30, "warehouseSlots": 6, "customersPerDay": 3,
       "goods": 4, "customerProfiles": 6, "mooringFee": 3, "goal": 62,
-      "demand": "2 marchandises/jour : +30 % d'offre et demandées ×5 ; les autres −15 % ; paire différente de la veille",
-      "fresh": "frais : −25 %/nuit (plancher 25 %) ; glacière : −10 %",
-      "upgradeDay5": ["shelf +2 slots", "sign +15 % offres", "icebox frais −10 %/nuit"]
+      "demand": "2 marchandises/jour : offres +30 %, poids ×5, paire ≠ veille ; autres marchandises −15 %",
+      "fresh": "frais : −25 %/nuit, plancher 25 % (glacière : −10 %) ; sec : se conserve",
+      "combos": "Navigatrice et Aéronaute commandent 2 marchandises d'un coup",
+      "upgradeDay5": ["shelf +2 slots (6→8)", "sign +15 % offres", "icebox frais −10 %/nuit"]
     },
     "artFamily": "« Marché céleste » — palette claire et festive : ciel #dceef8/#f3faf5, crème #fdf6e9, encre #2f3b47, corail #e2624b, moutarde #e8b64c, menthe #6fbf9b, bleu ballon #7fb2dd, rose #e8a0b4. Distincte du site LOB7 (nuit indigo interdite) et des familles récentes (manga N&B, désert midi, charpente, espace graphite, piscine)."
   },
   "tests": {
-    "node": "18/18 contre le index.html livré (achats/bornes, vente partielle, FIFO fraîcheur, ballon-enseigne, frais, porte jour 5, seuil victoire 61/62, banqueroute, garde-fou jour 1, budget=Σ, cohérence prix 400 graines, déterminisme, parité i18n, économie bornée 300 graines)",
-    "simulation": "600 graines × 5 stratégies (résultats complets dans bazar-nuages-dev/sim-results.json) : forecast 81 % / dry-only 67 % / fresh-only 14 % / chaotic 0 % / never-buy 0 % ; capital max observé 249 (pas de bénéfice infini) ; passif termine toujours à 0 exactement (aucune ruine par le tirage)"
+    "node": "18/18 contre le index.html livré (achats/bornes capital-entrepôt, vente partielle, FIFO fraîcheur prix exacts, ballon-enseigne +15 %, frais et vieillissement, porte jour 5, seuil victoire 61/62, banqueroute, garde-fou jour 1 demande ordinaire, budget=Σ qty×offre, cohérence prix sur 400 graines, déterminisme, parité i18n EN/FR/ES, économie bornée sur 300 graines)",
+    "bugsFoundAndFixed": [
+      "FIFO inversé : le tri livrait les unités les plus jeunes d'abord (corrigé en décroissant, test dédié)",
+      "stepper + désactivé au 1er client (deliver[i] undefined vs comparaison — replacé sur (deliver[i]||0))",
+      "gardes ledger pour états manipulés (sell/closeDay)"
+    ],
+    "simulation": "600 graines × 5 stratégies (bazar-nuages-dev/sim-results.json) : forecast 81 % (méd. 97) · dry-only 67 % (86) · fresh-only 14 % (28) · chaotic 0 % (34) · never-buy 0 % (0). Capital max observé 249 → pas de bénéfice infini. Le passif termine toujours à 0 exactement (30 = 10×3 frais) → aucune ruine imposée par le tirage ; banqueroute uniquement si l'on dépense tout puis échoue les frais."
   },
   "localPlay": {
     "browser": "Chromium (IAB) 420×860 et 900×720, http://127.0.0.1:8931",
-    "run": "Partie complète FR graine mission1 : VICTOIRE 102 pièces (objectif 62), 14 clients servis, étagère choisie jour 5 ; vente partielle vérifiée ligne à ligne (= 13) ; refus client ; modale fin de journée exacte ; rejouer (nouvelle graine) ; EN et ES vérifiés ; meilleure caisse persistée",
-    "visualGate": "Analyse d'image de la scène et de la couverture : PASS après 2 itérations (fanions redessinés dans le cadre, guirlande devant les ballons, soleil dégagé, titre couverture déplacé)",
-    "screenshots": ["01-accueil-EN.png", "02-marche-FR.png", "03-client-EN.png", "04-mercado-ES.png", "05-victoire-FR.png", "06-marche-FR-desktop.png"]
+    "run": "Partie complète FR graine mission1 : VICTOIRE 102 pièces (objectif 62), 14 clients servis, étagère choisie jour 5 ; vente partielle vérifiée ligne à ligne (« = 13 ») ; refus client ; modale fin de journée exacte (−19 +30 +18 −3 = 56) ; rejouer (nouvelle graine) ; EN et ES vérifiés ; meilleure caisse persistée ; layout desktop plafonné à 540 px",
+    "visualGate": "Analyse d'image scène + couverture : PASS après itérations (fanions redessinés DANS le cadre, guirlande devant les ballons, soleil dégagé, titre couverture déplacé sous la guirlande)",
+    "screenshots": ["01-accueil-EN.png", "02-marche-FR.png", "03-client-EN.png", "04-mercado-ES.png", "05-victoire-FR.png", "06-marche-FR-desktop.png", "07-lecteur-LOB7.png"]
   },
-  "repo": { "status": "pending" },
-  "lob7": { "status": "pending" },
-  "notes": []
+  "repo": {
+    "status": "pushed",
+    "url": "https://github.com/codex-lm/bazar-nuages",
+    "pagesUrl": "https://codex-lm.github.io/bazar-nuages/",
+    "commits": [
+      "b154ced jeu complet (index.html autonome + README/LICENSE/manifestes/DELIVERY/MISSION + cover)",
+      "19b1850 preuve ownership LOB7 bd_s_2ee1773c"
+    ],
+    "head": "19b185058748fddd8c8958d3aeb4aba8476c95c7"
+  },
+  "lob7": {
+    "status": "published",
+    "whoami": "Z Code (usr_ns4cywae), quotas avant publication : validations 0/2, imports 0/10, uploads 0/5",
+    "checkLocal": "PASSED — static-web-v1, 8 entrées, 76,0 Kio, sha256 0f41f26c…",
+    "draftId": "bd_s_2ee1773c-83dc-46f5-8bd1-f32f3952030c",
+    "idempotencyKey": "mission-bazar-nuages-2026-10-31",
+    "ownership": "fichier .lob7/ownership/bd_s_2ee1773c….txt (valeur 176add6f…) commité et poussé en 19b1850",
+    "prepare": "ready (commit figé 19b1850)",
+    "publish": "PUBLIÉ 2026-10-31T22:59:38Z — v1.0.0",
+    "gameId": "bg_s_e026e892-1196-437d-818e-acecee28bd66",
+    "variantId": "bv_s_aa5f6272-d272-429c-b5e9-ddf8318cb9fe",
+    "releaseId": "br_s_65b05924-b65d-4d76-9fb4-97229f7682da",
+    "gameUrl": "https://lob7.com/games/bg_s_e026e892-1196-437d-818e-acecee28bd66",
+    "playerUrl": "https://lob7.com/player/br_s_65b05924-b65d-4d76-9fb4-97229f7682da",
+    "cardVerified": "browser get : titre, description, genres strategy·management, thèmes market·balloons·sky, commandes, crédits complets (concept Cédric + contributions Z Code), MIT, auteur Z Code (usr_ns4cywae), source figée au commit 19b1850",
+    "readerVerified": "Lecteur public ouvert : iframe chargeant l'écran d'accueil complet du jeu (titre, Play, How to play, sélecteur EN/FR/ES) — snapshot DOM. Checks plateforme : malware/policy/runtime/staticAnalysis 4/4 passed ; GuardDuty NO_THREATS_FOUND ; « Loaded the exact browser entrypoint » + startup-smoke (clic centre + flèches + espace) passed. LIMITE honnête : mes propres clics DANS l'iframe du lecteur n'ont pas été rejouables en fin de session (routage d'entrée du panneau IAB dégradé, panne connue) ; équivalence prouvée par le commit figé identique au build joué intégralement en local + contrôle runtime indépendant de LOB7 sur ce contenu exact."
+  },
+  "outcome": "Jeu complet EN/FR/ES créé, testé (18/18), équilibré par simulation (600 graines × 5 stratégies), joué en local jusqu'à la victoire, livré sur GitHub public + Pages, PUBLIÉ sur LOB7 v1.0.0 sous le compte Z Code, fiche et lecteur vérifiés.",
+  "notes": [
+    "Autres dossiers préservés (aucune modification hors games/bazar-nuages*, evidence/bazar-nuages, _private/lock + contributions, journal.json).",
+    "Tâches planifiées 9h/14h30 intactes.",
+    "Port local 8931 utilisé (8742 était pris par le serveur d'un autre agent — non touché) ; serveur 8931 arrêté à la clôture."
+  ]
 }
